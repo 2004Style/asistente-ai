@@ -16,8 +16,10 @@ def build_linux_packages(binary_path, dist_dir):
     import tempfile
     import tarfile
     
+    suffix = os.environ.get("RBOT_PKG_SUFFIX", "")
+    
     # 1. Create Tar.gz archive (universal installer for Arch Linux, gentoo, etc.)
-    tar_path = dist_dir / "rbot-linux.tar.gz"
+    tar_path = dist_dir / f"rbot-linux{suffix}.tar.gz"
     print(f"Creating universal Tar.gz archive at {tar_path}...")
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -55,7 +57,7 @@ Categories=Utility;Development;
         print(f"  [✘] Failed to create Tar.gz archive: {e}")
         
     # 2. Create Debian/Ubuntu package (.deb)
-    deb_path = dist_dir / "rbot-linux.deb"
+    deb_path = dist_dir / f"rbot-linux{suffix}.deb"
     print(f"Creating Debian package at {deb_path}...")
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -105,7 +107,7 @@ Categories=Utility;Development;
         print(f"  [✘] Failed to create Debian package: {e}")
         
     # 3. Create RPM package (.rpm) using alien if available
-    rpm_path = dist_dir / "rbot-linux.rpm"
+    rpm_path = dist_dir / f"rbot-linux{suffix}.rpm"
     if deb_path.exists() and shutil.which("alien"):
         print(f"Converting Debian package to RPM using alien at {rpm_path}...")
         try:
@@ -134,7 +136,8 @@ def build_macos_packages(binary_path, dist_dir):
     import tempfile
     import tarfile
     
-    tar_path = dist_dir / "rbot-macos.tar.gz"
+    suffix = os.environ.get("RBOT_PKG_SUFFIX", "")
+    tar_path = dist_dir / f"rbot-macos{suffix}.tar.gz"
     print(f"Creating universal macOS Tar.gz archive at {tar_path}...")
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -162,7 +165,8 @@ def build_windows_packages(binary_path, dist_dir):
     """Builds a .zip archive for Windows containing the binary, install.bat and uninstall.bat."""
     import zipfile
     
-    zip_path = dist_dir / "rbot-windows.zip"
+    suffix = os.environ.get("RBOT_PKG_SUFFIX", "")
+    zip_path = dist_dir / f"rbot-windows{suffix}.zip"
     print(f"Creating Windows ZIP archive at {zip_path}...")
     try:
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:

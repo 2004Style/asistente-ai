@@ -13,28 +13,51 @@ jobs:
     name: Build Standalone Executables
     runs-on: ${{ matrix.os }}
     # GitHub Actions solo provee máquinas virtuales para Ubuntu, Windows y macOS.
-    # Usamos el runner de Ubuntu para compilar y empaquetar para TODAS las
-    # distribuciones de Linux (Debian, Arch, Fedora, etc.) en formatos .deb, .rpm y .tar.gz.
+    # Usamos una estrategia matricial explícita con CPU y GPU por separado.
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            artifact_name: rbot-linux
+            device: cpu
+            artifact_name: rbot-linux-cpu
             binary_name: rbot
-            release_name: rbot-linux
+            release_name: rbot-linux-cpu
+            pkg_suffix: -cpu
+          - os: ubuntu-latest
+            device: gpu
+            artifact_name: rbot-linux-gpu
+            binary_name: rbot
+            release_name: rbot-linux-gpu
+            pkg_suffix: -gpu
           - os: windows-latest
-            artifact_name: rbot-windows
+            device: cpu
+            artifact_name: rbot-windows-cpu
             binary_name: rbot.exe
-            release_name: rbot-windows.exe
+            release_name: rbot-windows-cpu.exe
+            pkg_suffix: -cpu
+          - os: windows-latest
+            device: gpu
+            artifact_name: rbot-windows-gpu
+            binary_name: rbot.exe
+            release_name: rbot-windows-gpu.exe
+            pkg_suffix: -gpu
           - os: macos-latest
+            device: cpu
             artifact_name: rbot-macos
             binary_name: rbot
             release_name: rbot-macos
+            pkg_suffix: ""
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Free up disk space (Linux GPU Build)
+        if: matrix.os == 'ubuntu-latest' && matrix.device == 'gpu'
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,19 +65,44 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install Dependencies
+      - name: Install System Dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y alien fakeroot portaudio19-dev
+
+      - name: Install System Dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install portaudio
+
+      - name: Install Dependencies (Linux/Windows CPU PyTorch)
+        if: matrix.os != 'macos-latest' && matrix.device == 'cpu'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+          # Install CPU-only version of PyTorch to keep binary size under ~300MB (instead of 2GB+)
+          python -m pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install .
+
+      - name: Install Dependencies (Linux/Windows GPU PyTorch)
+        if: matrix.os != 'macos-latest' && matrix.device == 'gpu'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+          # Install standard/GPU-enabled version of PyTorch
+          pip install .
+
+      - name: Install Dependencies (macOS)
+        if: matrix.os == 'macos-latest'
         run: |
           python -m pip install --upgrade pip
           python -m pip install pyinstaller
           pip install .
 
-      - name: Install System Packaging Tools (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y alien fakeroot
-
       - name: Build Executable
+        env:
+          RBOT_PKG_SUFFIX: ${{ matrix.pkg_suffix }}
         run: |
           python scripts/package.py
 
@@ -67,7 +115,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: dist/${{ matrix.release_name }}*
+          path: dist/*
 
   release:
     name: Create GitHub Release
@@ -77,16 +125,28 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Download Linux Build
+      - name: Download Linux CPU Build
         uses: actions/download-artifact@v4
         with:
-          name: rbot-linux
+          name: rbot-linux-cpu
           path: ./dist
 
-      - name: Download Windows Build
+      - name: Download Linux GPU Build
         uses: actions/download-artifact@v4
         with:
-          name: rbot-windows
+          name: rbot-linux-gpu
+          path: ./dist
+
+      - name: Download Windows CPU Build
+        uses: actions/download-artifact@v4
+        with:
+          name: rbot-windows-cpu
+          path: ./dist
+
+      - name: Download Windows GPU Build
+        uses: actions/download-artifact@v4
+        with:
+          name: rbot-windows-gpu
           path: ./dist
 
       - name: Download macOS Build
@@ -100,8 +160,8 @@ jobs:
         with:
           files: |
             ./dist/rbot-linux*
-            ./dist/rbot-windows.exe
-            ./dist/rbot-macos
+            ./dist/rbot-windows*
+            ./dist/rbot-macos*
           draft: false
           prerelease: false
         env:
