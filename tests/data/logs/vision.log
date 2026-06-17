@@ -1,0 +1,8 @@
+2026-06-17 11:09:46 [INFO] ScreenCapture: Wayland session active, attempting screenshot via grim
+2026-06-17 11:09:46 [INFO] CameraCapture: OpenCV available, attempting to capture from webcam index 0
+2026-06-17 11:09:47 [INFO] ScreenCapture: Wayland session active, attempting screenshot via grim
+2026-06-17 11:09:48 [INFO] YOLOv8Detector: Loading YOLOv8 model from '/home/style/Documents/lenguajes/python/asistente/ai-assistant/tests/data/models/yolov8n.pt' on device 'cuda'
+2026-06-17 11:09:49 [INFO] VisionManager: Loading CLIP model 'openai/clip-vit-base-patch32' (lazy load)...
+2026-06-17 11:09:49 [INFO] CLIPClassifier: Loading CLIP model 'openai/clip-vit-base-patch32' on device 'cuda'
+2026-06-17 11:09:49 [INFO] CLIPClassifier: Using FP16 precision for CLIP model loading.
+2026-06-17 11:09:55 [INFO] CameraCapture: OpenCV available, attempting to capture from webcam index 0

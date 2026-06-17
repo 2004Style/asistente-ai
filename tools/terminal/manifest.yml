@@ -1,0 +1,28 @@
+# Manifest describing terminal tool actions.
+name: terminal_tools
+description: Herramientas críticas para ejecutar comandos en el sistema operativo local (foreground, background, y terminación).
+version: 1.0.0
+actions:
+  run_command:
+    description: Ejecuta un comando en primer plano a través del Sandbox de comandos con restricciones de seguridad de variables de entorno y timeouts.
+    parameters:
+      command: string
+      timeout: float
+    permission_level: high
+    risk: execution
+    platforms: [linux, windows, macos]
+  run_in_background:
+    description: Inicia un proceso asíncrono en segundo plano, retornando su PID.
+    parameters:
+      command: string
+    permission_level: high
+    risk: execution
+    platforms: [linux, windows, macos]
+  kill_process:
+    description: Termina un proceso del sistema por su PID o por su nombre de proceso de forma forzada.
+    parameters:
+      pid: integer
+      process_name: string
+    permission_level: high
+    risk: execution
+    platforms: [linux, windows, macos]

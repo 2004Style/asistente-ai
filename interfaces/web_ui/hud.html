@@ -1,0 +1,1961 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rbot HUD - Neural Desktop Assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #0a0e17;
+        --cyan: #00d4ff;
+        --green: #00ff88;
+        --amber: #ffaa00;
+        --purple: #aa66ff;
+        --red: #ff3355;
+        --glass: rgba(10, 20, 40, 0.7);
+        --border: rgba(0, 212, 255, 1);
+        --text: rgba(0, 212, 255, 1);
+        --state-color: var(--cyan);
+        --state-glow: rgba(0, 212, 255, 1);
+        --ring-speed: 4s;
+        --muted: rgba(234, 255, 255, 0.56);
+        --panel: rgba(3, 18, 31, 0.58);
+        --dark: rgba(0, 8, 18, 0.78);
+      }
+      body {
+        background: var(--bg);
+        color: #fff;
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* HEADER */
+      .topbar {
+        position: relative;
+        z-index: 30;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        background: rgba(1, 8, 18, 0.68);
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+        pointer-events: auto;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(0, 245, 255, 0.42);
+        box-shadow: 0 0 7px rgba(0, 245, 255, 0.42);
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .brand span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .window-actions {
+        position: relative;
+        z-index: 80;
+        display: flex;
+        gap: 8px;
+        pointer-events: auto;
+      }
+
+      .window-btn {
+        position: relative;
+        z-index: 81;
+        width: 38px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(255, 255, 255, 0.055);
+        clip-path: polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+        cursor: pointer;
+        font-size: 13px;
+        pointer-events: auto;
+        user-select: none;
+      }
+
+      .window-btn.close {
+        color: rgba(255, 90, 120, 1);
+      }
+
+      /* MOCKUP HEADER */
+      .mockup-header {
+        position: absolute;
+        bottom: 0;
+        right: calc(50% - 160px);
+        height: 100px;
+        width: min-content;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        z-index: 100;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 14, 23, 0.95),
+          transparent
+        );
+      }
+
+      .mockup-mode-toggle {
+        display: flex;
+        gap: 4px;
+        background: rgba(0, 212, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 3px;
+      }
+      .mockup-mode-btn {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        padding: 8px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s;
+        opacity: 0.5;
+      }
+      .mockup-mode-btn.active {
+        background: rgba(0, 212, 255, 0.15);
+        color: var(--cyan);
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+      }
+      .mockup-mode-btn:not(.active):hover {
+        opacity: 0.8;
+      }
+
+      .mockup-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .mockup-img-demo-btn {
+        background: rgba(0, 212, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        opacity: 0.5;
+      }
+      .mockup-img-demo-btn:hover {
+        background: rgba(0, 212, 255, 0.12);
+        color: var(--cyan);
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+      }
+
+      /* MAIN LAYOUT */
+      .main-content {
+        position: fixed;
+        inset: 60px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        overflow: hidden;
+      }
+
+      /* CORE CONTAINER */
+      .core-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+      }
+      #coreCanvas {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* CORE - MAIN */
+      .core-container {
+        position: relative;
+        width: 320px;
+        height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2;
+        filter: drop-shadow(0 0 22px rgba(0, 212, 255, 0.22));
+      }
+      .core-container-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        isolation: isolate;
+      }
+      .core-container-inner::before,
+      .core-container-inner::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .core-container-inner::after {
+        inset: 72px;
+        background:
+          radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent 54%),
+          repeating-radial-gradient(
+            circle,
+            rgba(0, 212, 255, 0.14) 0 1px,
+            transparent 1px 16px
+          );
+        mask-image: radial-gradient(circle, transparent 0 28%, #000 30% 64%, transparent 66%);
+        opacity: 0.36;
+        animation: coreGridPulse 3.2s ease-in-out infinite;
+      }
+
+      /* Ring layer */
+      .s-ring {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: ringRotate var(--speed) linear infinite;
+        pointer-events: none;
+        z-index: 1;
+        mix-blend-mode: screen;
+      }
+      .s-ring.ccw {
+        animation-direction: reverse;
+      }
+      .s-ring svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .s-ring svg circle,
+      .s-ring svg path {
+        fill: none;
+        stroke: var(--state-color);
+        transition:
+          stroke 0.5s,
+          opacity 0.5s,
+          filter 0.5s;
+        filter: drop-shadow(0 0 5px color-mix(in srgb, var(--state-glow) 72%, transparent));
+      }
+
+      /* R1: Thin dashed outer ring */
+      .s-ring.r1 {
+        --speed: 9s;
+      }
+      .s-ring.r1 svg {
+        width: 100%;
+        height: 100%;
+      }
+      .s-ring.r1 circle {
+        stroke-width: 4;
+        stroke-dasharray: 2 10 20 12;
+        stroke-linecap: square;
+        opacity: 0.62;
+      }
+
+      /* R2: 12 trapezoids close to R1 */
+      .s-ring.r2 {
+        --speed: 7s;
+      }
+      .s-ring.r2 .trap {
+        position: absolute;
+        width: 17px;
+        height: 7px;
+        left: calc(50% - 8.5px);
+        top: calc(50% - 3.5px);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--state-color) 18% 82%,
+          transparent
+        );
+        box-shadow: 0 0 8px color-mix(in srgb, var(--state-glow) 46%, transparent);
+        opacity: 0.62;
+        transition:
+          background 0.5s,
+          opacity 0.5s;
+        animation: dataBlink 2.6s steps(2, end) infinite;
+      }
+
+      /* R3: Thick 3/4 arc */
+      .s-ring.r3 {
+        --speed: 5s;
+      }
+      .s-ring.r3 svg {
+        width: 90%;
+        height: 90%;
+      }
+      .s-ring.r3 circle {
+        stroke-width: 5;
+        stroke-dasharray: 68 42 16 132;
+        stroke-linecap: round;
+        opacity: 0.68;
+        filter: drop-shadow(0 0 6px var(--state-glow));
+      }
+
+      /* R4: 12 rectangles */
+      .s-ring.r4 {
+        --speed: 4s;
+      }
+      .s-ring.r4 .rect {
+        position: absolute;
+        width: 15px;
+        height: 10px;
+        left: calc(50% - 7.5px);
+        top: calc(50% - 5px);
+        border: 1px solid var(--state-color);
+        background:
+          linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.5) 49% 51%, transparent 52%),
+          color-mix(in srgb, var(--state-color) 18%, transparent 82%);
+        opacity: 0.55;
+        border-radius: 2px;
+        box-shadow:
+          inset 0 0 10px color-mix(in srgb, var(--state-glow) 30%, transparent),
+          0 0 10px color-mix(in srgb, var(--state-glow) 36%, transparent);
+        transition:
+          border 0.5s,
+          opacity 0.5s;
+      }
+
+      /* R5: Plasma Capsule Ring */
+      .s-ring.r5 {
+        --speed: 6s;
+      }
+      .s-ring.r5 svg {
+        width: 43%;
+        height: 43%;
+        overflow: visible;
+      }
+      .s-ring.r5 .r5-track {
+        fill: none;
+        stroke: var(--state-color);
+        stroke-width: 1.5;
+        stroke-dasharray: 12 8 2 8;
+        opacity: 0.42;
+        transition: stroke 0.5s;
+      }
+      .s-ring.r5 .r5-cap {
+        fill: var(--state-color);
+        transition: fill 0.5s;
+        animation: r5Blip 2s ease-in-out infinite;
+      }
+      .s-ring.r5 .r5-dot {
+        fill: var(--state-color);
+        transition: fill 0.5s;
+        animation: r5Blip 2s ease-in-out infinite;
+        animation-delay: -1s;
+      }
+      @keyframes r5Blip {
+        0%,
+        100% {
+          opacity: 0.15;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* R6: Round dot chain */
+      .s-ring.r6 {
+        --speed: 3s;
+      }
+      .s-ring.r6 svg {
+        width: 60%;
+        height: 60%;
+      }
+      .s-ring.r6 circle {
+        stroke-width: 8;
+        stroke-dasharray: 1 11;
+        stroke-linecap: round;
+        opacity: 0.62;
+      }
+
+      /* R7: Symbols */
+      .s-ring.r7 {
+        --speed: 5.5s;
+      }
+      .s-ring.r7 .sym {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        left: calc(50% - 7px);
+        top: calc(50% - 7px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--state-color);
+        opacity: 0.78;
+        text-shadow: 0 0 10px var(--state-glow);
+        transition:
+          color 0.5s,
+          opacity 0.5s;
+      }
+
+      /* R8: Fine dotted circle for density */
+      .s-ring.r8 {
+        --speed: 4.5s;
+      }
+      .s-ring.r8 svg {
+        width: 44%;
+        height: 44%;
+      }
+      .s-ring.r8 circle {
+        stroke-width: 1;
+        stroke-dasharray: 1 7;
+        opacity: 0.38;
+      }
+
+      /* R9: Inner dashed ring */
+      .s-ring.r9 {
+        --speed: 3.5s;
+      }
+      .s-ring.r9 svg {
+        width: 32%;
+        height: 32%;
+      }
+      .s-ring.r9 circle {
+        stroke-width: 56;
+        stroke-dasharray: 1 13;
+        opacity: 0.2;
+      }
+
+      /* Core orb */
+      .core-orb {
+        position: relative;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.86), transparent 12%),
+          radial-gradient(circle at 50% 50%, var(--state-color), rgba(13, 5, 40, 0.82) 48%, rgba(0, 7, 18, 0.94) 72%);
+        border: 1px solid color-mix(in srgb, var(--state-color) 82%, white 18%);
+        box-shadow:
+          0 0 20px var(--state-glow),
+          0 0 64px color-mix(in srgb, var(--state-glow) 42%, transparent),
+          inset 0 0 20px rgba(255, 255, 255, 0.16),
+          inset 0 -12px 28px rgba(0, 0, 0, 0.45);
+        transition: all 0.5s;
+        z-index: 3;
+        animation: coreBreath 2.8s ease-in-out infinite;
+      }
+      .core-orb-inner {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          var(--state-color) 45deg,
+          transparent 90deg,
+          transparent 180deg,
+          var(--state-color) 225deg,
+          transparent 270deg,
+          transparent 360deg
+        );
+        opacity: 1;
+        animation: orbScan 3s linear infinite;
+      }
+      .core-orb::after {
+        content: "";
+        position: absolute;
+        inset: -16px;
+        border-radius: 50%;
+        border: 1px dashed var(--state-color);
+        opacity: 0.08;
+        animation: ringRotate 9s linear infinite reverse;
+      }
+      .core-orb .orb-cross {
+        position: absolute;
+        inset: 25%;
+        border-radius: 50%;
+        border: 1px solid var(--state-color);
+        opacity: 0.12;
+      }
+      .core-orb .orb-cross::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -30%;
+        right: -30%;
+        height: 1px;
+        background: var(--state-color);
+        opacity: 0.08;
+      }
+      .core-orb .orb-cross::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: -30%;
+        bottom: -30%;
+        width: 1px;
+        background: var(--state-color);
+        opacity: 0.08;
+      }
+      .core-orb .orb-needle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 28px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--state-color));
+        opacity: 0.15;
+        transform-origin: 0 0;
+        animation: orbNeedle 2s linear infinite;
+        border-radius: 0 2px 2px 0;
+      }
+
+      @keyframes orbScan {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes orbNeedle {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes ringRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes coreGridPulse {
+        0%,
+        100% {
+          opacity: 0.24;
+          transform: scale(0.98);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(1.01);
+        }
+      }
+      @keyframes coreBreath {
+        0%,
+        100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+      }
+      @keyframes dataBlink {
+        0%,
+        44%,
+        100% { opacity: 0.86; }
+        45%,
+        58% { opacity: 0.32; }
+      }
+
+      /* STATE-SPECIFIC ANIMATIONS */
+      .core-container.waiting .s-ring { animation-play-state: paused; }
+      .core-container.waiting .core-orb { animation-play-state: paused; }
+      .core-container.waiting .core-orb::before,
+      .core-container.waiting .core-orb::after,
+      .core-container.waiting .core-orb .orb-needle,
+      .core-container.waiting .core-orb-inner { animation-play-state: paused; }
+      .core-container.waiting .s-ring .trap,
+      .core-container.waiting .s-ring .rect,
+      .core-container.waiting .s-ring .sym,
+      .core-container.waiting .s-ring .r5-cap,
+      .core-container.waiting .s-ring .r5-dot,
+      .core-container.waiting .s-ring svg circle,
+      .core-container.waiting .s-ring svg path { opacity: 0.2; }
+      .core-container.waiting .core-orb::before,
+      .core-container.waiting .core-orb::after { opacity: 0.06; }
+      .core-container.waiting .s-ring .r5-cap,
+      .core-container.waiting .s-ring .r5-dot { animation-play-state: paused; }
+
+      .core-container.listening .s-ring { animation-duration: calc(var(--speed) * 2) !important; }
+      .core-container.listening .s-ring .trap,
+      .core-container.listening .s-ring .rect,
+      .core-container.listening .s-ring .sym { animation-duration: calc(var(--speed) * 2) !important; }
+      
+      .core-container.processing .s-ring { animation-duration: calc(var(--speed) * 0.2) !important; }
+      .core-container.processing .s-ring .trap,
+      .core-container.processing .s-ring .rect,
+      .core-container.processing .s-ring .sym { animation-duration: calc(var(--speed) * 0.2) !important; }
+
+      .core-container.error .core-orb { opacity: 0.7; }
+      .core-container.error .s-ring .trap,
+      .core-container.error .s-ring .rect,
+      .core-container.error .s-ring .sym,
+      .core-container.error .s-ring .r5-cap,
+      .core-container.error .s-ring svg circle,
+      .core-container.error .s-ring svg path { opacity: 0.35; }
+
+      /* SIDEBAR LEFT */
+      .sidebar-left {
+        position: fixed;
+        left: 0;
+        top: 64px;
+        bottom: 0;
+        width: 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+        z-index: 10;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      .hologram-panel {
+        pointer-events: auto;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        background:
+          linear-gradient(145deg, rgba(0, 212, 255, 0.08), transparent 42%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 18%),
+          rgba(2, 11, 24, 0.72);
+        border: 1px solid rgba(0, 212, 255, 0.38);
+        border-radius: 6px;
+        backdrop-filter: blur(14px);
+        position: relative;
+        overflow: hidden;
+        clip-path: polygon(
+          0 14px,
+          14px 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% calc(100% - 16px),
+          calc(100% - 16px) 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+        box-shadow:
+          0 0 18px rgba(0, 212, 255, 0.06),
+          inset 0 0 20px rgba(0, 212, 255, 0.035),
+          inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      }
+      .hologram-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(rgba(0, 212, 255, 0.045) 1px, transparent 1px);
+        background-size: 20px 20px;
+        mask-image: linear-gradient(180deg, #000, transparent 92%);
+        opacity: 0.3;
+        pointer-events: none;
+      }
+      .hologram-panel::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 9px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.42), transparent);
+        opacity: 0.62;
+      }
+      .panel-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px 8px;
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(0, 212, 255, 1);
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.42);
+      }
+      .panel-header i {
+        font-size: 10px;
+        opacity: 0.9;
+        width: 18px;
+        height: 18px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(0, 212, 255, 0.28);
+        border-radius: 4px;
+        background: rgba(0, 212, 255, 0.08);
+      }
+      .panel-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2px 10px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        scrollbar-width: none;
+        position: relative;
+        z-index: 1;
+      }
+      .panel-body::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Hologram input */
+      .hologram-input {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.1), transparent 38%),
+          rgba(3, 13, 28, 0.68);
+        border: 1px solid rgba(0, 212, 255, 0.48);
+        border-radius: 7px;
+        backdrop-filter: blur(14px);
+        transition:
+          border-color 0.3s,
+          box-shadow 0.3s;
+        min-height: 40px;
+        clip-path: polygon(0 9px, 9px 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        box-shadow:
+          inset 0 0 16px rgba(0, 212, 255, 0.045),
+          0 0 18px rgba(0, 212, 255, 0.06);
+      }
+      .hologram-input:focus-within {
+        border-color: rgba(0, 255, 136, 0.62);
+        box-shadow:
+          inset 0 0 20px rgba(0, 255, 136, 0.06),
+          0 0 26px rgba(0, 255, 136, 0.12);
+      }
+      .hologram-input input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: rgba(255, 255, 255, 1);
+        font-size: 11px;
+        padding: 6px 8px;
+        font-family: inherit;
+        letter-spacing: 0.5px;
+      }
+      .hologram-input input::placeholder {
+        color: rgba(0, 212, 255, 1);
+        font-size: 10px;
+        letter-spacing: 1px;
+      }
+      .hologram-input button {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.18), rgba(0, 212, 255, 0.1));
+        border: 1px solid rgba(0, 255, 136, 0.58);
+        color: var(--cyan);
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+      .hologram-input button:hover {
+        background: rgba(0, 212, 255, 0.18);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.12);
+      }
+
+      /* SIDEBAR RIGHT */
+      .sidebar-right {
+        position: fixed;
+        right: 0;
+        top: 64px;
+        bottom: 0;
+        width: min-content;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        z-index: 10;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      .sys-widget {
+        pointer-events: auto;
+        min-width: 76px;
+        background:
+          linear-gradient(135deg, rgba(0, 212, 255, 0.14), transparent 54%),
+          rgba(2, 14, 27, 0.72);
+        border: 1px solid rgba(0, 212, 255, 0.48);
+        border-radius: 5px;
+        padding: 8px 9px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        backdrop-filter: blur(14px);
+        position: relative;
+        overflow: hidden;
+        clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+        box-shadow:
+          inset 0 0 18px rgba(0, 212, 255, 0.045),
+          0 0 18px rgba(0, 212, 255, 0.07);
+      }
+      .sys-widget::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 34%),
+          linear-gradient(180deg, rgba(0, 212, 255, 0.16), transparent 1px);
+        pointer-events: none;
+      }
+      .sys-widget::after {
+        content: "";
+        position: absolute;
+        right: 7px;
+        bottom: 6px;
+        width: 18px;
+        height: 2px;
+        background: rgba(0, 212, 255, 0.45);
+        box-shadow: -7px 0 0 rgba(0, 212, 255, 0.18);
+        pointer-events: none;
+      }
+      .sys-header {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 8px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: rgba(0, 212, 255, 1);
+        position: relative;
+        z-index: 1;
+      }
+      .sys-header i {
+        font-size: 10px;
+        width: 13px;
+        text-align: center;
+      }
+
+      .sys-value {
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(0, 212, 255, 1);
+        font-family: monospace;
+        letter-spacing: 1px;
+        text-wrap: nowrap;
+        position: relative;
+        z-index: 1;
+      }
+
+      .sys-widget.net {
+        border-color: rgba(0, 255, 136, 0.46);
+        background:
+          linear-gradient(135deg, rgba(0, 255, 136, 0.14), transparent 54%),
+          rgba(2, 16, 22, 0.72);
+      }
+      .sys-widget.net .sys-header,
+      .sys-widget.net .sys-value {
+        color: rgba(0, 255, 136, 1);
+      }
+
+      .sys-widget.gpu {
+        border-color: rgba(170, 102, 255, 0.5);
+        background:
+          linear-gradient(135deg, rgba(170, 102, 255, 0.16), transparent 54%),
+          rgba(12, 8, 28, 0.72);
+      }
+      .sys-widget.gpu .sys-header,
+      .sys-widget.gpu .sys-value {
+        color: rgba(170, 102, 255, 1);
+      }
+
+      /* Hologram messages */
+      .msg {
+        position: relative;
+        font-size: 10.5px;
+        padding: 8px 9px 8px 11px;
+        border-radius: 5px;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.12), transparent 68%),
+          rgba(0, 212, 255, 0.035);
+        border: 1px solid rgba(0, 212, 255, 0.18);
+        border-left: 2px solid rgba(0, 255, 136, 0.68);
+        opacity: 0;
+        transform: translateY(6px) scale(0.985);
+        animation: msgIn 0.28s ease-out forwards;
+        line-height: 1.3;
+        color: rgba(0, 212, 255, 1);
+        flex-shrink: 0;
+        width: 100%;
+        box-shadow:
+          inset 0 0 14px rgba(0, 212, 255, 0.035),
+          0 0 12px rgba(0, 212, 255, 0.04);
+      }
+      .msg::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        right: 5px;
+        width: 18px;
+        height: 1px;
+        background: rgba(0, 255, 136, 0.42);
+        box-shadow: 0 4px 0 rgba(0, 212, 255, 0.18);
+      }
+      .msg.jarvis {
+        background:
+          linear-gradient(90deg, rgba(170, 102, 255, 0.15), transparent 70%),
+          rgba(170, 102, 255, 0.04);
+        border-color: rgba(170, 102, 255, 0.2);
+        border-left-color: rgba(170, 102, 255, 0.76);
+        color: rgba(170, 102, 255, 1);
+      }
+      @keyframes msgIn {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* CAMERA VIEW */
+      .camera-view {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transition: opacity 0.7s ease;
+      }
+      .camera-view.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .camera-feed {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+        filter: brightness(0.7) contrast(1.2) hue-rotate(190deg) saturate(0.5);
+      }
+      .camera-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 14, 23, 0.3),
+          transparent 30%,
+          transparent 70%,
+          rgba(10, 14, 23, 0.5)
+        );
+        pointer-events: none;
+      }
+      .camera-corners {
+        position: absolute;
+        inset: 20px;
+        pointer-events: none;
+      }
+      .camera-corners::before,
+      .camera-corners::after {
+        content: "";
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-color: var(--cyan);
+        border-style: solid;
+        opacity: 0.3;
+      }
+      .camera-corners::before {
+        top: 0;
+        left: 0;
+        border-width: 2px 0 0 2px;
+      }
+      .camera-corners::after {
+        top: 0;
+        right: 0;
+        border-width: 2px 2px 0 0;
+      }
+      .camera-corners :nth-child(2) {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--cyan);
+        border-width: 0 0 2px 2px;
+        opacity: 0.3;
+      }
+      .camera-corners :nth-child(3) {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--cyan);
+        border-width: 0 2px 2px 0;
+        opacity: 0.3;
+      }
+
+      /* IMAGE DISPLAY - projection from core */
+      .image-display {
+        position: fixed;
+        inset: 0;
+        z-index: 15;
+        display: none;
+        pointer-events: none;
+      }
+      .image-display.active {
+        display: block;
+        pointer-events: auto;
+      }
+      .image-card {
+        position: fixed;
+        background:
+          linear-gradient(145deg, rgba(0, 212, 255, 0.12), transparent 42%),
+          linear-gradient(315deg, rgba(0, 255, 136, 0.08), transparent 48%),
+          rgba(5, 10, 20, 0.94);
+        border: 1px solid rgba(0, 212, 255, 0.72);
+        backdrop-filter: blur(8px) saturate(1.2);
+        pointer-events: auto;
+        box-shadow:
+          0 0 44px rgba(0, 212, 255, 0.14),
+          0 0 90px rgba(0, 255, 136, 0.06),
+          inset 0 0 34px rgba(0, 212, 255, 0.045);
+        opacity: 0;
+        filter: brightness(1.08) contrast(1.06);
+        animation: imageCardFade 0.22s ease-out forwards;
+      }
+      .image-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border: 1px solid rgba(0, 212, 255, 0.86);
+        clip-path: polygon(0 0, 34% 0, 34% 1px, 0 1px, 0 100%, 1px 100%, 1px 0);
+        pointer-events: none;
+      }
+      @keyframes imageCardFade {
+        0% {
+          opacity: 0;
+          filter: brightness(1.18) contrast(1.08);
+        }
+        100% {
+          opacity: 1;
+          filter: brightness(1) contrast(1);
+        }
+      }
+      .image-card .img-wrapper {
+        position: relative;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.035);
+      }
+      .image-card .img-wrapper .img-placeholder {
+        position: relative;
+        z-index: 1;
+        clip-path: inset(0 0 100% 0);
+        will-change: clip-path, opacity;
+        animation: imageContentReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .image-card .img-wrapper .img-placeholder img {
+        width: 100%;
+        display: block;
+        object-fit: contain;
+        opacity: 0.88;
+        filter: saturate(1.18) contrast(1.12) brightness(0.88);
+        max-height: 260px;
+      }
+      @keyframes imageContentReveal {
+        0% {
+          clip-path: inset(0 0 100% 0);
+          opacity: 0.2;
+        }
+        100% {
+          clip-path: inset(0 0 0 0);
+          opacity: 1;
+        }
+      }
+      .image-card .img-wrapper .img-tech-overlay {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(rgba(0, 212, 255, 0.07) 1px, transparent 1px),
+          radial-gradient(circle at 15% 10%, rgba(0, 255, 136, 0.13), transparent 32%);
+        background-size: 18px 18px, 18px 18px, auto;
+        pointer-events: none;
+        mix-blend-mode: overlay;
+        z-index: 2;
+        opacity: 0.7;
+      }
+      .image-card .img-wrapper .img-corner {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-color: rgba(0, 212, 255, 0.25);
+        border-style: solid;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .image-card .img-wrapper .img-corner.tl {
+        top: 3px;
+        left: 3px;
+        border-width: 1px 0 0 1px;
+      }
+      .image-card .img-wrapper .img-corner.tr {
+        top: 3px;
+        right: 3px;
+        border-width: 1px 1px 0 0;
+      }
+      .image-card .img-wrapper .img-corner.bl {
+        bottom: 3px;
+        left: 3px;
+        border-width: 0 0 1px 1px;
+      }
+      .image-card .img-wrapper .img-corner.br {
+        bottom: 3px;
+        right: 3px;
+        border-width: 0 1px 1px 0;
+      }
+      .image-card-close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 51, 85, 1);
+        color: rgba(255, 51, 85, 1);
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        border-radius: 2px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .image-card:hover .image-card-close,
+      .image-card:hover .image-card-web {
+        opacity: 1;
+      }
+      .image-card-close:hover {
+        background: rgba(255, 51, 85, 0.2);
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .image-card-web {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(0, 212, 255, 1);
+        color: rgba(0, 212, 255, 1);
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        border-radius: 2px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .image-card-web:hover {
+        background: rgba(0, 212, 255, 0.15);
+        color: var(--cyan);
+        border-color: var(--cyan);
+      }
+      
+      /* Connector beam */
+      .connector-beam {
+        position: fixed;
+        pointer-events: none;
+        z-index: 14;
+        display: none;
+      }
+      .connector-beam.active {
+        display: block;
+      }
+      .connector-beam canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* PROCESS ORBIT */
+      .process-orbit {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+      .process-node {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        opacity: 0;
+      }
+      .process-node.active {
+        opacity: 1;
+      }
+      .process-node .node-core {
+        position: absolute;
+        inset: 2px;
+        background: var(--cyan);
+        border-radius: 1px;
+        box-shadow:
+          0 0 6px var(--cyan),
+          inset 0 0 4px rgba(0, 212, 255, 0.5);
+      }
+      .process-node .node-ring {
+        position: absolute;
+        inset: 0;
+        border: 1px solid rgba(0, 212, 255, 1);
+        border-radius: 1px;
+        transform: rotate(45deg);
+      }
+      .process-node .node-label {
+        position: absolute;
+        left: 16px;
+        top: -2px;
+        font-family: monospace;
+        font-size: 7px;
+        color: rgba(0, 212, 255, 1);
+        letter-spacing: 1px;
+        white-space: nowrap;
+      }
+      .process-node.trail {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 4px var(--cyan);
+        opacity: 0;
+      }
+
+      /* CONFIRMATION MODAL OVERLAY */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(4, 10, 20, 0.85);
+        backdrop-filter: blur(12px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        pointer-events: auto;
+      }
+      .modal-content {
+        background: 
+          linear-gradient(145deg, rgba(0, 212, 255, 0.12), transparent 42%),
+          rgba(5, 10, 20, 0.95);
+        border: 1px solid rgba(0, 212, 255, 0.6);
+        border-radius: 8px;
+        padding: 30px;
+        max-width: 480px;
+        width: 90%;
+        box-shadow: 
+          0 0 44px rgba(0, 212, 255, 0.14),
+          0 0 90px rgba(0, 212, 255, 0.05);
+        text-align: center;
+        clip-path: polygon(0 14px, 14px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 8px 100%, 0 calc(100% - 8px));
+        animation: scaleUp 0.3s ease forwards;
+      }
+      .modal-title {
+        font-size: 15px;
+        letter-spacing: 2px;
+        font-weight: 700;
+        color: var(--cyan);
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.42);
+      }
+      .modal-body {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 24px;
+        line-height: 1.5;
+        letter-spacing: 0.5px;
+        text-align: left;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+      .modal-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+      }
+      .modal-btn.confirm {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--green);
+        border-color: var(--green);
+      }
+      .modal-btn.confirm:hover {
+        background: rgba(0, 255, 136, 0.25);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+      }
+      .modal-btn.deny {
+        background: rgba(255, 51, 85, 0.15);
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .modal-btn.deny:hover {
+        background: rgba(255, 51, 85, 0.25);
+        box-shadow: 0 0 15px rgba(255, 51, 85, 0.2);
+      }
+
+      /* CONFIGURATION PANEL OVERLAY */
+      .config-panel {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        width: 600px;
+        max-width: 90%;
+        max-height: 85vh;
+        background:
+          linear-gradient(145deg, rgba(0, 212, 255, 0.12), transparent 42%),
+          rgba(2, 11, 24, 0.95);
+        border: 1px solid rgba(0, 212, 255, 0.6);
+        border-radius: 8px;
+        box-shadow:
+          0 0 50px rgba(0, 212, 255, 0.18),
+          0 0 100px rgba(0, 0, 0, 0.5);
+        z-index: 90;
+        display: none;
+        flex-direction: column;
+        backdrop-filter: blur(20px);
+        clip-path: polygon(
+          0 14px,
+          14px 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% calc(100% - 16px),
+          calc(100% - 16px) 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: auto;
+      }
+      .config-panel.active {
+        display: flex;
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        .main-content {
+          top: 64px;
+        }
+        .core-container {
+          width: 220px;
+          height: 220px;
+        }
+        .core-orb {
+          width: 45px;
+          height: 45px;
+        }
+        .sidebar-left {
+          width: 200px;
+          padding: 8px;
+          gap: 6px;
+        }
+        .sidebar-right {
+          width: 140px;
+          padding: 8px;
+          gap: 5px;
+        }
+        .sys-widget {
+          padding: 6px 8px;
+        }
+        .image-card {
+          max-width: 90%;
+        }
+        .image-card .img-wrapper .img-placeholder img {
+          max-height: 160px;
+        }
+        .file-card {
+          max-width: 90%;
+        }
+      }
+
+      /* FILE DISPLAY - projection from core (right side) */
+      .file-display {
+        position: fixed;
+        inset: 0;
+        z-index: 15;
+        display: none;
+        pointer-events: none;
+      }
+      .file-display.active {
+        display: block;
+        pointer-events: auto;
+      }
+      .file-card {
+        position: fixed;
+        background:
+          linear-gradient(145deg, rgba(0, 255, 136, 0.12), transparent 42%),
+          linear-gradient(315deg, rgba(0, 212, 255, 0.08), transparent 48%),
+          rgba(5, 10, 20, 0.94);
+        border: 1px solid rgba(0, 255, 136, 0.72);
+        backdrop-filter: blur(8px) saturate(1.2);
+        pointer-events: auto;
+        box-shadow:
+          0 0 44px rgba(0, 255, 136, 0.14),
+          0 0 90px rgba(0, 212, 255, 0.06),
+          inset 0 0 34px rgba(0, 255, 136, 0.045);
+        opacity: 0;
+        filter: brightness(1.08) contrast(1.06);
+        animation: fileCardFade 0.22s ease-out forwards;
+      }
+      .file-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border: 1px solid rgba(0, 255, 136, 0.86);
+        clip-path: polygon(0 0, 34% 0, 34% 1px, 0 1px, 0 100%, 1px 100%, 1px 0);
+        pointer-events: none;
+      }
+      @keyframes fileCardFade {
+        0% {
+          opacity: 0;
+          filter: brightness(1.18) contrast(1.08);
+          transform: scale(0.95) translateY(10px);
+        }
+        100% {
+          opacity: 1;
+          filter: brightness(1) contrast(1);
+          transform: scale(1) translateY(0);
+        }
+      }
+      .file-card .file-wrapper {
+        position: relative;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.035);
+        padding: 20px;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .file-card .file-tech-overlay {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(0, 255, 136, 0.05) 1px, transparent 1px),
+          linear-gradient(rgba(0, 255, 136, 0.04) 1px, transparent 1px),
+          radial-gradient(circle at 85% 10%, rgba(0, 212, 255, 0.1), transparent 32%);
+        background-size: 18px 18px, 18px 18px, auto;
+        pointer-events: none;
+        mix-blend-mode: overlay;
+        z-index: 2;
+        opacity: 0.7;
+      }
+      .file-card .file-corner {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-color: rgba(0, 255, 136, 0.25);
+        border-style: solid;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .file-card .file-corner.tl {
+        top: 3px;
+        left: 3px;
+        border-width: 1px 0 0 1px;
+      }
+      .file-card .file-corner.tr {
+        top: 3px;
+        right: 3px;
+        border-width: 1px 1px 0 0;
+      }
+      .file-card .file-corner.bl {
+        bottom: 3px;
+        left: 3px;
+        border-width: 0 0 1px 1px;
+      }
+      .file-card .file-corner.br {
+        bottom: 3px;
+        right: 3px;
+        border-width: 0 1px 1px 0;
+      }
+      .file-card-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: transparent;
+        border: none;
+        color: rgba(0, 255, 136, 0.6);
+        cursor: pointer;
+        font-size: 14px;
+        z-index: 10;
+        transition: color 0.15s, transform 0.15s;
+        padding: 5px;
+      }
+      .file-card-close:hover {
+        color: #00ff88;
+        transform: scale(1.1);
+      }
+      .file-card-title {
+        color: #00ff88;
+        font-family: monospace;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      }
+      .file-card .file-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .file-card .file-icon-container {
+        font-size: 44px;
+        margin: 5px 0;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.3));
+      }
+      .file-card .file-name {
+        font-weight: bold;
+        color: #fff;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        text-align: center;
+      }
+      .file-card .file-location {
+        font-size: 9px;
+        color: #888;
+        word-break: break-all;
+        font-family: monospace;
+        opacity: 0.7;
+        text-align: center;
+        max-width: 100%;
+      }
+      .file-card-actions {
+        display: flex;
+        justify-content: center;
+        z-index: 5;
+      }
+      .file-action-btn {
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid rgba(0, 255, 136, 0.4);
+        color: #00ff88;
+        font-family: monospace;
+        font-size: 11px;
+        padding: 6px 12px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .file-action-btn:hover {
+        background: rgba(0, 255, 136, 0.2);
+        border-color: #00ff88;
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <!-- Replaced logo img with self-contained styling icon -->
+        <div class="brand-mark" style="display: grid; place-items: center; border-radius: 4px; background: rgba(0,212,255,0.06);">
+          <i class="fas fa-terminal" style="color: var(--cyan); font-size: 14px; text-shadow: 0 0 5px var(--cyan);"></i>
+        </div>
+        <div>
+          <h1>rbot Assistant</h1>
+          <span>Neural Command Interface</span>
+        </div>
+      </div>
+
+      <div class="window-actions">
+        <button
+          class="window-btn"
+          id="configBtn"
+          type="button"
+          title="Configuración"
+          aria-label="Configuración"
+        >
+          <i class="fas fa-cog"></i>
+        </button>
+        <button
+          class="window-btn"
+          id="minimizeBtn"
+          type="button"
+          title="Minimizar"
+          aria-label="Minimizar"
+        >
+          —
+        </button>
+        <button
+          class="window-btn close"
+          id="closeBtn"
+          type="button"
+          title="Cerrar"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+      </div>
+    </header>
+
+    <!-- MOCKUP CONTROL BAR -->
+    <div class="mockup-header">
+      <div class="mockup-mode-toggle">
+        <button class="mockup-mode-btn active" id="coreModeBtn" data-mode="core">
+          <i class="fas fa-circle"></i> Core
+        </button>
+        <button class="mockup-mode-btn" id="cameraModeBtn" data-mode="camera">
+          <i class="fas fa-camera"></i> Camera
+        </button>
+        <button class="mockup-mode-btn" id="screenModeBtn" data-mode="screen">
+          <i class="fas fa-desktop"></i> Screen
+        </button>
+      </div>
+      <div class="mockup-header-actions">
+        <button
+          class="mockup-img-demo-btn"
+          id="imgDemoBtn"
+          title="Vista previa de imagen"
+        >
+          <i class="fas fa-image"></i>
+        </button>
+        <button
+          class="mockup-img-demo-btn"
+          id="procDemoBtn"
+          title="Procesos en segundo plano"
+        >
+          <i class="fas fa-microchip"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+      <!-- CORE SECTION -->
+      <div class="core-section" id="coreSection">
+        <div class="core-container waiting" id="coreContainer">
+          <div class="core-container-inner">
+            <!-- R1: Thin dashed outer ring -->
+            <div class="s-ring r1 cw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="155" />
+              </svg>
+            </div>
+
+            <!-- R2: Trapezoids -->
+            <div class="s-ring r2 ccw">
+              <div class="trap" style="transform: rotate(0deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(30deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(60deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(90deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(120deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(150deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(180deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(210deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(240deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(270deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(300deg) translateY(-140px) skewX(-40deg)"></div>
+              <div class="trap" style="transform: rotate(330deg) translateY(-140px) skewX(-40deg)"></div>
+            </div>
+
+            <!-- R3: Thick 3/4 arc -->
+            <div class="s-ring r3 ccw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="135" />
+              </svg>
+            </div>
+
+            <!-- R4: Rectangles -->
+            <div class="s-ring r4 cw">
+              <div class="rect" style="transform: rotate(0deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(30deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(60deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(90deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(120deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(150deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(180deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(210deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(240deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(270deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(300deg) translateY(-100px)"></div>
+              <div class="rect" style="transform: rotate(330deg) translateY(-100px)"></div>
+            </div>
+
+            <!-- R5: Plasma Capsule Ring -->
+            <div class="s-ring r5 ccw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="110" class="r5-track" />
+                <g transform="rotate(0, 160, 160)"><rect class="r5-cap" x="153" y="47" width="14" height="6" rx="3" /></g>
+                <g transform="rotate(45, 160, 160)"><circle class="r5-dot" cx="160" cy="50" r="3" /></g>
+                <g transform="rotate(90, 160, 160)"><rect class="r5-cap" x="153" y="47" width="14" height="6" rx="3" /></g>
+                <g transform="rotate(135, 160, 160)"><circle class="r5-dot" cx="160" cy="50" r="3" /></g>
+                <g transform="rotate(180, 160, 160)"><rect class="r5-cap" x="153" y="47" width="14" height="6" rx="3" /></g>
+                <g transform="rotate(225, 160, 160)"><circle class="r5-dot" cx="160" cy="50" r="3" /></g>
+                <g transform="rotate(270, 160, 160)"><rect class="r5-cap" x="153" y="47" width="14" height="6" rx="3" /></g>
+                <g transform="rotate(315, 160, 160)"><circle class="r5-dot" cx="160" cy="50" r="3" /></g>
+              </svg>
+            </div>
+
+            <!-- R6: Dot chain -->
+            <div class="s-ring r6 cw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="96" />
+              </svg>
+            </div>
+
+            <!-- R7: Symbols -->
+            <div class="s-ring r7 ccw">
+              <div class="sym" style="transform: rotate(0deg) translateY(-78px)">◆</div>
+              <div class="sym" style="transform: rotate(60deg) translateY(-78px)">◇</div>
+              <div class="sym" style="transform: rotate(120deg) translateY(-78px)">◆</div>
+              <div class="sym" style="transform: rotate(180deg) translateY(-78px)">◇</div>
+              <div class="sym" style="transform: rotate(240deg) translateY(-78px)">◆</div>
+              <div class="sym" style="transform: rotate(300deg) translateY(-78px)">◇</div>
+            </div>
+
+            <!-- R8: Fine dotted circle -->
+            <div class="s-ring r8 cw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="70" />
+              </svg>
+            </div>
+
+            <!-- R9: Inner dashed ring -->
+            <div class="s-ring r9 ccw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="51" />
+              </svg>
+            </div>
+
+            <div class="core-orb">
+              <div class="core-orb-inner"></div>
+              <div class="orb-cross"></div>
+              <div class="orb-needle"></div>
+            </div>
+            <div class="process-orbit" id="processOrbit"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEFT SIDEBAR - hologram panels -->
+      <div class="sidebar-left" id="sidebarLeft">
+        <div class="hologram-panel" id="userPanelContainer">
+          <div class="panel-header"><i class="fas fa-user"></i> Mi señal</div>
+          <div class="panel-body" id="userPanel"></div>
+        </div>
+        <div class="hologram-panel" id="jarvisPanelContainer">
+          <div class="panel-header"><i class="fas fa-robot"></i> ASISTENTE</div>
+          <div class="panel-body" id="jarvisPanel">
+            <div class="msg jarvis">◆ ¡Hola! Soy rbot, tu asistente inteligente. Pregúntame o háblame usando la interfaz neural o comandos de voz.</div>
+          </div>
+        </div>
+        <div class="hologram-input">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Interfaz neuronal..."
+            autofocus
+            autocomplete="off"
+          />
+          <button id="btnSend"><i class="fas fa-arrow-up"></i></button>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR - system monitor -->
+      <div class="sidebar-right" id="sidebarRight">
+        <div class="sys-widget cpu">
+          <div class="sys-header"><i class="fas fa-microchip"></i> CPU</div>
+          <span class="sys-value" id="cpuValue">0%</span>
+        </div>
+        <div class="sys-widget gpu">
+          <div class="sys-header"><i class="fas fa-server"></i> GPU</div>
+          <span class="sys-value" id="gpuValue">0%</span>
+        </div>
+        <div class="sys-widget ram">
+          <div class="sys-header"><i class="fas fa-memory"></i> RAM</div>
+          <span class="sys-value" id="ramValue">0 GB</span>
+        </div>
+        <div class="sys-widget net">
+          <div class="sys-header"><i class="fas fa-wifi"></i> Red</div>
+          <span class="sys-value" id="netValue">0 Mbps</span>
+        </div>
+      </div>
+
+      <!-- CAMERA VIEW -->
+      <div class="camera-view" id="cameraView">
+        <video class="camera-feed" id="cameraFeed" autoplay playsinline></video>
+        <img class="camera-feed" id="screenFeed" style="display: none; object-fit: contain;" alt="Screenshot Preview" />
+        <div class="camera-overlay"></div>
+        <div class="camera-corners">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGE DISPLAY - projection from core -->
+    <div class="image-display" id="imageDisplay">
+      <div class="connector-beam" id="connectorBeam">
+        <canvas id="beamCanvas"></canvas>
+      </div>
+      <div class="image-card" id="imageCard">
+        <div class="img-wrapper">
+          <div class="img-placeholder" id="imgPlaceholder"></div>
+          <div class="img-tech-overlay"></div>
+          <div class="img-corner tl"></div>
+          <div class="img-corner tr"></div>
+          <div class="img-corner bl"></div>
+          <div class="img-corner br"></div>
+          <button class="image-card-close" id="imgClose">
+            <i class="fas fa-times"></i>
+          </button>
+          <button class="image-card-web" id="imgWebBtn">
+            <i class="fas fa-external-link-alt"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal-content">
+        <div class="modal-title">⚠️ Confirmación Requerida</div>
+        <div class="modal-body" id="modalText">
+          El asistente solicita ejecutar una herramienta del sistema.
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn confirm" id="btnConfirm">Aprobar</button>
+          <button class="modal-btn deny" id="btnDeny">Rechazar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILE DISPLAY - projection from core (right side) -->
+    <div class="file-display" id="fileDisplay">
+      <div class="connector-beam" id="fileConnectorBeam">
+        <canvas id="fileBeamCanvas"></canvas>
+      </div>
+      <div class="file-card" id="fileCard">
+        <div class="file-wrapper">
+          <div class="file-tech-overlay"></div>
+          <div class="file-corner tl"></div>
+          <div class="file-corner tr"></div>
+          <div class="file-corner bl"></div>
+          <div class="file-corner br"></div>
+          
+          <button class="file-card-close" id="btnFileClose">
+            <i class="fas fa-times"></i>
+          </button>
+
+          <div class="file-card-title">📄 Archivo Creado</div>
+          
+          <div class="file-body">
+            <div class="file-icon-container">
+              <i class="fas fa-file-alt" id="fileModalIcon"></i>
+            </div>
+            <div class="file-name" id="fileModalName">
+              nombre_del_archivo.pdf
+            </div>
+            <div class="file-location" id="fileModalPath">
+              /home/style/Documents/reporte.pdf
+            </div>
+          </div>
+          
+          <div class="file-card-actions">
+            <button class="file-action-btn" id="btnFileView">
+              <i class="fas fa-folder-open"></i> Ver en Carpeta
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- CANVAS PARTICLES -->
+    <canvas id="coreCanvas"></canvas>
+
+    <script src="/static/hud.js"></script>
+  </body>
+</html>

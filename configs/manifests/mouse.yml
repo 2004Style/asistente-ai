@@ -1,0 +1,29 @@
+# Manifest describing mouse tool actions.
+name: mouse_tools
+description: Herramientas para simular movimientos de cursor, clics y scroll.
+version: 1.0.0
+actions:
+  move_mouse:
+    description: Desplaza el cursor del mouse a coordenadas X/Y específicas en la pantalla.
+    parameters:
+      x: integer
+      y: integer
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  click_mouse:
+    description: Realiza un clic del mouse (izquierdo, derecho o central) con repetición configurable.
+    parameters:
+      button: string
+      clicks: integer
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  scroll_mouse:
+    description: Simula el desplazamiento de la rueda del mouse en una dirección (up, down, left, right).
+    parameters:
+      direction: string
+      amount: integer
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]

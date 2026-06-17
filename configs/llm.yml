@@ -1,0 +1,5 @@
+api_base: null
+api_key: env:PROVIDER_API_KEY
+model: openrouter/auto
+provider: openrouter
+temperature: 0.7

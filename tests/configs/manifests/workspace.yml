@@ -1,0 +1,18 @@
+# Manifest describing workspace tool actions.
+name: workspace_tools
+description: Herramientas para listar y cambiar de espacio de trabajo o escritorios virtuales.
+version: 1.0.0
+actions:
+  list_workspaces:
+    description: Retorna la lista de escritorios virtuales o espacios de trabajo activos.
+    parameters: {}
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  switch_workspace:
+    description: Cambia el escritorio virtual activo a otro especificado por id.
+    parameters:
+      workspace_id: integer
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]

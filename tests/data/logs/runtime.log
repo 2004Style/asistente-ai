@@ -1,0 +1,3 @@
+2026-06-17 11:09:46 [INFO] Daemon: New WebSocket client connected.
+2026-06-17 11:09:46 [INFO] Daemon: Saved HUD input as Pasted Payload in session 'test_session': https://youtube.com/watch?v=xyz
+2026-06-17 11:09:46 [INFO] Daemon: WebSocket client disconnected.

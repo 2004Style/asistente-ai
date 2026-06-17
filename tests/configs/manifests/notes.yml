@@ -1,0 +1,26 @@
+# Manifest describing notes tool actions.
+name: notes_tools
+description: Herramientas sencillas de solo lectura y edición para crear y gestionar notas locales de usuario en formato markdown.
+version: 1.0.0
+actions:
+  list_notes:
+    description: Devuelve el listado de archivos de notas creados por el asistente en data/notes.
+    parameters: {}
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  create_note:
+    description: Crea una nota en archivo de texto o markdown dentro del directorio centralizado.
+    parameters:
+      filename: string
+      content: string
+    permission_level: low
+    risk: modification
+    platforms: [linux, windows, macos]
+  delete_note:
+    description: Borra permanentemente una nota de usuario. Requiere confirmación por nivel de riesgo.
+    parameters:
+      filename: string
+    permission_level: medium
+    risk: modification
+    platforms: [linux, windows, macos]

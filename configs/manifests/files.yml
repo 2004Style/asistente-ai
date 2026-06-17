@@ -1,0 +1,43 @@
+# Manifest describing file tool actions.
+name: file_tools
+description: Herramientas para leer, escribir, copiar, mover o borrar archivos locales en el disco.
+version: 1.0.0
+actions:
+  read_file:
+    description: Lee el contenido de un archivo de texto en el sistema con límites de tamaño de lectura.
+    parameters:
+      file_path: string
+    permission_level: medium
+    risk: read_only
+    platforms: [linux, windows, macos]
+  write_file:
+    description: Crea o sobrescribe un archivo con nuevo contenido especificado. Requiere confirmación por defecto.
+    parameters:
+      file_path: string
+      content: string
+    permission_level: medium
+    risk: modification
+    platforms: [linux, windows, macos]
+  copy_file:
+    description: Copia un archivo de una ubicación origen a un destino.
+    parameters:
+      source_path: string
+      destination_path: string
+    permission_level: medium
+    risk: modification
+    platforms: [linux, windows, macos]
+  move_file:
+    description: Mueve o renombra un archivo del sistema.
+    parameters:
+      source_path: string
+      destination_path: string
+    permission_level: medium
+    risk: modification
+    platforms: [linux, windows, macos]
+  delete_file:
+    description: Elimina de forma permanente o envía a la papelera un archivo. Acción sensible con confirmación requerida.
+    parameters:
+      file_path: string
+    permission_level: high
+    risk: modification
+    platforms: [linux, windows, macos]

@@ -1,0 +1,43 @@
+# Manifest describing window tool actions.
+name: window_tools
+description: Herramientas para listar, enfocar, cerrar y redimensionar ventanas en el entorno gráfico.
+version: 1.0.0
+actions:
+  list_windows:
+    description: Lista las ventanas activas en el entorno gráfico con sus títulos y clases.
+    parameters: {}
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  focus:
+    description: Enfoca una ventana gráfica específica usando su dirección o identificador, o mediante una búsqueda por texto.
+    parameters:
+      address: string
+      query: string
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  close:
+    description: Envía una señal de cerrado ordenado a una ventana activa. Puede provocar pérdida de cambios no guardados.
+    parameters:
+      address: string
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  move_resize:
+    description: Mueve y redimensiona una ventana a nuevas coordenadas y tamaños de pantalla.
+    parameters:
+      address: string
+      x: integer
+      y: integer
+      width: integer
+      height: integer
+    permission_level: medium
+    risk: modification
+    platforms: [linux, windows, macos]
+  inspect_screen:
+    description: Realiza capturas del contenido visual actual para análisis multimodal o visión.
+    parameters: {}
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]

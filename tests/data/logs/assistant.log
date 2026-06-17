@@ -1,0 +1,77 @@
+2026-06-17 11:09:46 [INFO] ToolRegistry: Validating registry against 9 YAML manifest files in /home/style/Documents/lenguajes/python/asistente/ai-assistant/tests/configs/manifests...
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'web_tools' from web.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'keyboard_tools' from keyboard.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'mouse_tools' from mouse.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'window_tools' from window.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'workspace_tools' from workspace.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'application_tools' from applications.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'file_tools' from files.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'terminal_tools' from terminal.yml
+2026-06-17 11:09:46 [INFO] ToolRegistry: Successfully validated and synchronized manifest group 'notes_tools' from notes.yml
+2026-06-17 11:09:46 [INFO] VoiceManager: Initializing STT provider: 'gemini_stt'
+2026-06-17 11:09:46 [INFO] VoiceManager: Initializing TTS provider: 'gemini_live'
+2026-06-17 11:09:46 [INFO] Bootstrap: Bootstrap finished successfully. All systems nominal.
+2026-06-17 11:09:46 [INFO] Daemon: New WebSocket client connected.
+2026-06-17 11:09:46 [INFO] Daemon: Saved HUD input as Pasted Payload in session 'test_session': https://youtube.com/watch?v=xyz
+2026-06-17 11:09:46 [INFO] Daemon: WebSocket client disconnected.
+2026-06-17 11:09:46 [INFO] ScreenCapture: Wayland session active, attempting screenshot via grim
+2026-06-17 11:09:46 [INFO] CameraCapture: OpenCV available, attempting to capture from webcam index 0
+2026-06-17 11:09:47 [INFO] ScreenCapture: Wayland session active, attempting screenshot via grim
+2026-06-17 11:09:48 [INFO] YOLOv8Detector: Loading YOLOv8 model from '/home/style/Documents/lenguajes/python/asistente/ai-assistant/tests/data/models/yolov8n.pt' on device 'cuda'
+2026-06-17 11:09:49 [INFO] VisionManager: Loading CLIP model 'openai/clip-vit-base-patch32' (lazy load)...
+2026-06-17 11:09:49 [INFO] CLIPClassifier: Loading CLIP model 'openai/clip-vit-base-patch32' on device 'cuda'
+2026-06-17 11:09:49 [INFO] CLIPClassifier: Using FP16 precision for CLIP model loading.
+2026-06-17 11:09:50 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-06-17 11:09:50 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openai/clip-vit-base-patch32/3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268/config.json "HTTP/1.1 200 OK"
+2026-06-17 11:09:50 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:50 [WARNING] huggingface_hub.utils._http: Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-06-17 11:09:51 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:51 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-06-17 11:09:51 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:51 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32 "HTTP/1.1 200 OK"
+2026-06-17 11:09:52 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32/commits/main "HTTP/1.1 200 OK"
+2026-06-17 11:09:52 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:52 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32/discussions?p=0 "HTTP/1.1 200 OK"
+2026-06-17 11:09:52 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:52 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32/commits/refs%2Fpr%2F66 "HTTP/1.1 200 OK"
+2026-06-17 11:09:52 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/chat_template.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/refs%2Fpr%2F66/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/refs%2Fpr%2F66/model.safetensors "HTTP/1.1 302 Found"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/audio_tokenizer_config.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-06-17 11:09:53 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openai/clip-vit-base-patch32/3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-06-17 11:09:54 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:54 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-06-17 11:09:54 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openai/clip-vit-base-patch32/3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268/preprocessor_config.json "HTTP/1.1 200 OK"
+2026-06-17 11:09:54 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-06-17 11:09:54 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openai/clip-vit-base-patch32/3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268/config.json "HTTP/1.1 200 OK"
+2026-06-17 11:09:55 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-06-17 11:09:55 [INFO] httpx: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openai/clip-vit-base-patch32/3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-06-17 11:09:55 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-06-17 11:09:55 [INFO] httpx: HTTP Request: GET https://huggingface.co/api/models/openai/clip-vit-base-patch32/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-06-17 11:09:55 [INFO] CameraCapture: OpenCV available, attempting to capture from webcam index 0
+2026-06-17 11:09:57 [INFO] BrowserUtils: Launching custom browser 'firefox' command: ['/usr/bin/firefox', 'https://example.com']
+2026-06-17 11:09:57 [WARNING] BrowserUtils: El navegador 'chrome' no se encuentra instalado en el sistema. Se utilizará el navegador por defecto.
+2026-06-17 11:09:57 [INFO] BrowserUtils: Opening default browser for URL: https://example.com
+2026-06-17 11:09:57 [INFO] OpenYoutubeTool: Found first video ID 'dQw4w9WgXcQ' for query 'never gonna give you up'. Playing directly...
+2026-06-17 11:09:57 [INFO] OpenYoutubeTool: Opening YouTube search for: python tutorial
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Opening WhatsApp Chat with phone +51999999999: https://web.whatsapp.com/send?phone=+51999999999
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Waiting 12 seconds for WhatsApp Web to load chat...
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Pasting and sending message: Hola
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Opening WhatsApp Web to search contact: Juan Perez
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Waiting 12 seconds for WhatsApp Web to load...
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Focusing search box...
+2026-06-17 11:09:57 [INFO] OpenWhatsappTool: Typing contact name: Juan Perez
+2026-06-17 11:09:57 [INFO] WebSearchDirectTool: Programmatic search on DuckDuckGo for: python
+2026-06-17 11:09:57 [INFO] GoogleMapsTool: Opening Google Maps directions to: Barcelona via travel mode: driving
+2026-06-17 11:09:57 [INFO] DownloadMediaTool: Downloading from YouTube: https://youtube.com/watch?v=123 as format: mp3
+2026-06-17 11:09:57 [INFO] DownloadMediaTool: Downloading generic file: https://example.com/document.pdf to: /tmp/pytest-of-style/pytest-4/test_download_media_asyncio_0/document.pdf
+2026-06-17 11:09:57 [INFO] CreateWordDocumentTool: Generating Word document: /tmp/pytest-of-style/pytest-4/test_create_word_document_asyn0/test_report.docx
+2026-06-17 11:09:57 [INFO] CreatePDFDocumentTool: Generating PDF document: /tmp/pytest-of-style/pytest-4/test_create_pdf_document_async0/test_report.pdf
+2026-06-17 11:09:57 [INFO] CreateProjectTool: Creating project 'my_store' in: /tmp/pytest-of-style/pytest-4/test_create_project_asyncio_0/my_store
+2026-06-17 11:09:57 [INFO] InspectImageTool: Downloading remote image for analysis: https://example.com/cat.jpg
+2026-06-17 11:09:57 [INFO] InspectImageTool: Reading image bytes from: /tmp/tmp3zh3hl0k.jpg
+2026-06-17 11:09:57 [INFO] InspectImageTool: Running YOLOv8 object detection...
+2026-06-17 11:09:57 [INFO] InspectImageTool: Running CLIP scene classification...

@@ -1,0 +1,3 @@
+db_path: data/db/assistant.db
+short_term_limit: 30
+vector_store_type: sqlite

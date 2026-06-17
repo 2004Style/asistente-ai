@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rbot Config - Centro de Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --cyan: #00d4ff;
+            --green: #00ff88;
+            --amber: #ffaa00;
+            --purple: #aa66ff;
+            --red: #ff3355;
+            --glass-bg: rgba(2, 11, 24, 0.72);
+            --glass-border: rgba(0, 212, 255, 0.38);
+            --glass-focus: rgba(0, 212, 255, 0.15);
+            --text-main: #f3f0ff;
+            --text-muted: rgba(234, 255, 255, 0.56);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .config-container {
+            width: 100%;
+            max-width: 800px;
+            background: 
+              linear-gradient(145deg, rgba(0, 212, 255, 0.08), transparent 42%),
+              linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 18%),
+              var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 8px;
+            box-shadow: 
+              0 0 44px rgba(0, 212, 255, 0.14),
+              inset 0 0 20px rgba(0, 212, 255, 0.035);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 30px;
+            clip-path: polygon(
+              0 14px,
+              14px 0,
+              calc(100% - 8px) 0,
+              100% 8px,
+              100% calc(100% - 16px),
+              calc(100% - 16px) 100%,
+              8px 100%,
+              0 calc(100% - 8px)
+            );
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            padding-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.42);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--red);
+            box-shadow: 0 0 8px var(--red);
+            transition: all 0.3s;
+        }
+
+        .status-dot.connected {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+        }
+
+        .btn-back {
+            color: var(--cyan);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background: rgba(0, 212, 255, 0.05);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+            background: rgba(0, 212, 255, 0.18);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.12);
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            color: var(--cyan);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+            padding-bottom: 6px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"], select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 4px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, select:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.15);
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--cyan);
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-group label {
+            text-transform: none;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            margin-top: 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 255, 0.15));
+            border: 1px solid rgba(0, 255, 136, 0.6);
+            color: white;
+            border-radius: 4px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            outline: none;
+        }
+
+        .btn-save:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            display: none;
+            text-align: center;
+        }
+
+        .status-message.success {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .status-message.error {
+            background: rgba(255, 51, 85, 0.15);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="config-container">
+        <div class="header">
+            <h1>Ajustes de Sistema</h1>
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Desconectado</span>
+                </div>
+                <a href="/hud" class="btn-back"><i class="fas fa-arrow-left"></i> HUD Principal</a>
+            </div>
+        </div>
+
+        <form id="configForm" onsubmit="saveConfig(event)">
+            <div class="form-section">
+                <!-- Seccion LLM -->
+                <h3 class="section-title"><i class="fas fa-brain"></i> Cerebro del Asistente (LLM)</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="llmProvider">Proveedor Inteligencia</label>
+                        <select id="llmProvider" onchange="updateProviderFields()">
+                            <option value="openai">OpenAI</option>
+                            <option value="gemini">Google Gemini</option>
+                            <option value="anthropic">Anthropic Claude</option>
+                            <option value="openrouter">OpenRouter</option>
+                            <option value="ollama">Ollama (Local)</option>
+                            <option value="local">Local Engine</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="llmModel">Modelo Específico</label>
+                        <select id="llmModel" onchange="checkManualModel()"></select>
+                        <input type="text" id="llmModelManual" style="display: none; margin-top: 8px;" placeholder="Escribe el modelo manualmente...">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="llmTemp">Temperatura (Creatividad)</label>
+                        <input type="number" id="llmTemp" min="0" max="2" step="0.1" value="0.7">
+                    </div>
+                    <!-- API Key input (cloud only) -->
+                    <div class="form-group" id="apiKeyGroup">
+                        <label for="llmApiKey" id="apiKeyLabel">API Key del Proveedor</label>
+                        <input type="password" id="llmApiKey" placeholder="Rellena para proveedores cloud...">
+                    </div>
+                    <!-- Server Host URL (local/ollama only) -->
+                    <div class="form-group" id="apiBaseGroup" style="display: none;">
+                        <label for="llmApiBase">URL del Servidor (Host)</label>
+                        <input type="text" id="llmApiBase" placeholder="http://localhost:11434">
+                    </div>
+                </div>
+
+                <!-- Seccion Voz -->
+                <h3 class="section-title"><i class="fas fa-microphone"></i> Configuración de Voz y Audio</h3>
+                
+                <div class="form-row">
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="voiceEnabled">
+                        <label for="voiceEnabled">Habilitar el subsistema de voz (Audio Entrada/Salida)</label>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="voicePTT" checked>
+                        <label for="voicePTT">Modo Push-To-Talk (Activar capturas manualmente)</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sttProvider">Motor Reconocimiento Voz (STT)</label>
+                        <select id="sttProvider" onchange="updateVoiceFields()">
+                            <option value="vosk">Vosk (Local - Desconectado)</option>
+                            <option value="whisper_local">Whisper Local (Alta Calidad)</option>
+                            <option value="faster_whisper">Faster-Whisper (Optimizado GPU)</option>
+                            <option value="gemini_stt">Gemini STT (API Directa)</option>
+                            <option value="gemini_live">Gemini Live STT (Audio Nativo)</option>
+                            <option value="groq_stt">Groq Whisper Cloud (Ultra Rápido)</option>
+                            <option value="openai_stt">OpenAI Whisper Cloud (Oficial)</option>
+                            <option value="google_stt">Google Cloud STT (Google Speech)</option>
+                        </select>
+                        
+                        <!-- Contenedor para descarga de Vosk -->
+                        <div id="voskDownloadContainer" style="display: none; margin-top: 10px; background: rgba(0, 212, 255, 0.05); border: 1px dashed rgba(0, 212, 255, 0.3); padding: 12px; border-radius: 4px;">
+                            <p style="font-size: 11px; margin: 0 0 8px 0; color: var(--text-muted);">Modelo local de Vosk no detectado.</p>
+                            <button type="button" id="btnDownloadVosk" class="btn-back" style="width: 100%; justify-content: center; font-size: 11px;" onclick="downloadVoskModel()">
+                                <i class="fas fa-download"></i> Descargar Modelo Vosk (40MB)
+                            </button>
+                            <div id="voskDownloadProgress" style="display: none; margin-top: 8px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 10px; overflow: hidden;">
+                                    <div id="voskProgressBar" style="background: var(--cyan); width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+                                </div>
+                                <p id="voskProgressText" style="font-size: 10px; margin: 4px 0 0 0; color: var(--cyan); text-align: center;">Descargando: 0%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ttsProvider">Motor Síntesis de Habla (TTS)</label>
+                        <select id="ttsProvider" onchange="updateVoiceFields()">
+                            <option value="piper">Piper TTS (Local - Rápido)</option>
+                            <option value="edge_tts">Edge TTS (Voces Microsoft Cloud)</option>
+                            <option value="elevenlabs">ElevenLabs TTS (Clonación Premium)</option>
+                            <option value="gemini_tts">Gemini TTS (Cloud / API - Requiere GCP)</option>
+                            <option value="gemini_live">Gemini Live (Audio Nativo - Sin GCP)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Dynamic voice configuration rows -->
+                <div class="form-row" id="voiceExtraRow" style="display: none;">
+                    <div class="form-group" id="sttModelGroup" style="display: none;">
+                        <label for="sttModel">Modelo STT (Whisper)</label>
+                        <select id="sttModel">
+                            <option value="tiny">Tiny (Rápido / Menor VRAM)</option>
+                            <option value="base" selected>Base (Balanceado)</option>
+                            <option value="small">Small (Preciso)</option>
+                            <option value="medium">Medium (Muy Preciso)</option>
+                            <option value="large-v3">Large V3 (Máxima Precisión)</option>
+                        </select>
+                        
+                        <!-- Contenedor para descarga de Whisper -->
+                        <div id="whisperDownloadContainer" style="display: none; margin-top: 10px; background: rgba(0, 212, 255, 0.05); border: 1px dashed rgba(0, 212, 255, 0.3); padding: 12px; border-radius: 4px;">
+                            <p style="font-size: 11px; margin: 0 0 8px 0; color: var(--text-muted);">Modelo local de Whisper no detectado.</p>
+                            <button type="button" id="btnDownloadWhisper" class="btn-back" style="width: 100%; justify-content: center; font-size: 11px;" onclick="downloadWhisperModel()">
+                                <i class="fas fa-download"></i> Descargar Modelo Whisper
+                            </button>
+                            <div id="whisperDownloadProgress" style="display: none; margin-top: 8px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 10px; overflow: hidden;">
+                                    <div id="whisperProgressBar" style="background: var(--cyan); width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+                                </div>
+                                <p id="whisperProgressText" style="font-size: 10px; margin: 4px 0 0 0; color: var(--cyan); text-align: center;">Descargando: 0%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="ttsVoiceGroup" style="display: none;">
+                        <label for="ttsVoiceSelect" id="ttsVoiceLabel">Voz del Sintetizador</label>
+                        <select id="ttsVoiceSelect" style="display: none;"></select>
+                        <input type="text" id="ttsVoiceInput" placeholder="Ruta del modelo o Voice ID..." style="display: none;">
+                        
+                        <!-- Contenedor para descarga de Piper -->
+                        <div id="piperDownloadContainer" style="display: none; margin-top: 10px; background: rgba(0, 212, 255, 0.05); border: 1px dashed rgba(0, 212, 255, 0.3); padding: 12px; border-radius: 4px;">
+                            <p style="font-size: 11px; margin: 0 0 8px 0; color: var(--text-muted);">Modelo no detectado localmente.</p>
+                            <button type="button" id="btnDownloadPiper" class="btn-back" style="width: 100%; justify-content: center; font-size: 11px;" onclick="downloadPiperModel()">
+                                <i class="fas fa-download"></i> Descargar Modelo
+                            </button>
+                            <div id="piperDownloadProgress" style="display: none; margin-top: 8px;">
+                                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 10px; overflow: hidden;">
+                                    <div id="piperProgressBar" style="background: var(--cyan); width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+                                </div>
+                                <p id="piperProgressText" style="font-size: 10px; margin: 4px 0 0 0; color: var(--cyan); text-align: center;">Descargando: 0%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row" id="voiceKeyRow" style="display: none;">
+                    <div class="form-group" id="voiceApiKeyGroup">
+                        <label for="voiceApiKey">API Key para Servicios de Voz (Cloud)</label>
+                        <input type="password" id="voiceApiKey" placeholder="Configura VOICE_API_KEY en tu .env o escribe aquí...">
+                    </div>
+                </div>
+
+                <!-- Seccion Seguridad -->
+                <h3 class="section-title"><i class="fas fa-shield-halved"></i> Seguridad, Auditoría y Permisos</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="minPermission">Solicitar Confirmación desde Nivel:</label>
+                        <select id="minPermission">
+                            <option value="low">Bajo (Ejecuciones Básicas)</option>
+                            <option value="medium">Medio (Escritura y Atajos)</option>
+                            <option value="high">Alto (Instalar Paquetes)</option>
+                            <option value="critical">Crítico (Peligro de datos)</option>
+                        </select>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="requireConfirm" checked>
+                        <label for="requireConfirm">Requerir aprobación humana obligatoria para acciones</label>
+                    </div>
+                </div>
+
+                <!-- Seccion General -->
+                <h3 class="section-title"><i class="fas fa-sliders"></i> Sistema y Límites</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appName">Nombre Identificador (Asistente)</label>
+                        <input type="text" id="appName" value="rbot">
+                    </div>
+                    <div class="form-group">
+                        <label for="shortTermLimit">Mensajes en Memoria Corto Plazo</label>
+                        <input type="number" id="shortTermLimit" min="5" max="100" value="20">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save">Guardar Cambios de Configuración</button>
+        </form>
+
+        <div class="status-message" id="statusMsg">Configuración guardada correctamente.</div>
+    </div>
+
+    <script src="/static/config.js"></script>
+</body>
+</html>

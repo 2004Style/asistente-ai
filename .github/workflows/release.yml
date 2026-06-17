@@ -1,0 +1,108 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger build on tags like v1.0.0, v2.1.0
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Standalone Executables
+    runs-on: ${{ matrix.os }}
+    # GitHub Actions solo provee máquinas virtuales para Ubuntu, Windows y macOS.
+    # Usamos el runner de Ubuntu para compilar y empaquetar para TODAS las
+    # distribuciones de Linux (Debian, Arch, Fedora, etc.) en formatos .deb, .rpm y .tar.gz.
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: rbot-linux
+            binary_name: rbot
+            release_name: rbot-linux
+          - os: windows-latest
+            artifact_name: rbot-windows
+            binary_name: rbot.exe
+            release_name: rbot-windows.exe
+          - os: macos-latest
+            artifact_name: rbot-macos
+            binary_name: rbot
+            release_name: rbot-macos
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+          pip install .
+
+      - name: Install System Packaging Tools (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y alien fakeroot
+
+      - name: Build Executable
+        run: |
+          python scripts/package.py
+
+      - name: Rename Artifact
+        shell: bash
+        run: |
+          mv dist/${{ matrix.binary_name }} dist/${{ matrix.release_name }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.release_name }}*
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Linux Build
+        uses: actions/download-artifact@v4
+        with:
+          name: rbot-linux
+          path: ./dist
+
+      - name: Download Windows Build
+        uses: actions/download-artifact@v4
+        with:
+          name: rbot-windows
+          path: ./dist
+
+      - name: Download macOS Build
+        uses: actions/download-artifact@v4
+        with:
+          name: rbot-macos
+          path: ./dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./dist/rbot-linux*
+            ./dist/rbot-windows.exe
+            ./dist/rbot-macos
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

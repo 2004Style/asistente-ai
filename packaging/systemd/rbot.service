@@ -1,0 +1,13 @@
+# systemd unit file for the RBot AI assistant daemon.
+# Use Type=simple because the process stays in the foreground # and systemd supervises it directly.
+[Unit]
+Description=RBot AI Assistant
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 -m ai_assistant.app.main
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

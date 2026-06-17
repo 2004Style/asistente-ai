@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  rbot:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./configs:/app/configs
+    environment:
+      - PYTHONUNBUFFERED=1

@@ -1,0 +1,8 @@
+<service>
+  <id>rbot</id>
+  <name>rbot AI Assistant</name>
+  <description>AI Desktop Assistant Daemon</description>
+  <executable>python.exe</executable>
+  <arguments>app/main.py</arguments>
+  <logmode>rotate</logmode>
+</service>

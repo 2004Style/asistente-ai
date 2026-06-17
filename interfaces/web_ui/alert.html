@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>RBot - Alerta de Voz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #050a14;
+      --card-bg: rgba(5, 10, 20, 0.94);
+      --red: #ff5c5c;
+      --cyan: #00d4ff;
+      --yellow: #ffd05c;
+      --text: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    /* Cyberpunk Glowing Container */
+    .alert-container {
+      background: 
+        linear-gradient(145deg, rgba(255, 92, 92, 0.12), transparent 45%),
+        var(--card-bg);
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 30px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 
+        0 0 30px rgba(255, 92, 92, 0.15),
+        0 0 60px rgba(0, 212, 255, 0.04),
+        inset 0 0 20px rgba(255, 92, 92, 0.05);
+      text-align: center;
+      position: relative;
+      clip-path: polygon(0 14px, 14px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 8px 100%, 0 calc(100% - 8px));
+    }
+
+    .alert-container::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border: 1px solid var(--red);
+      clip-path: polygon(0 0, 30% 0, 30% 1px, 0 1px, 0 100%, 1px 100%, 1px 0);
+      pointer-events: none;
+    }
+
+    /* Glowing Icons */
+    .warning-icon {
+      font-size: 54px;
+      color: var(--red);
+      filter: drop-shadow(0 0 12px rgba(255, 92, 92, 0.7));
+      margin-bottom: 20px;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.85;
+      }
+    }
+
+    .title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      text-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
+    }
+
+    .message {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 15px;
+      border: 1px solid rgba(255, 92, 92, 0.2);
+      border-radius: 4px;
+      text-align: left;
+    }
+
+    .recommendations {
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    .rec-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rec-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .rec-item i {
+      color: var(--yellow);
+      margin-top: 2px;
+    }
+
+    .rec-item strong {
+      color: #fff;
+    }
+
+    /* Interactive Buttons */
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 12px 24px;
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+      border-radius: 4px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.05);
+    }
+
+    .btn:hover {
+      background: rgba(0, 212, 255, 0.22);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .close-btn {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .close-btn:hover {
+      color: var(--red);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="alert-container">
+    <div class="warning-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    
+    <h1 class="title">Límite de Voz Agotado</h1>
+    
+    <div class="message">
+      Se ha agotado el límite de cuota (HTTP 429) o no tienes configurada la API Key para la voz en la nube de <strong>Gemini Live / ElevenLabs</strong>. 
+      <br><br>
+      El asistente se ha recuperado temporalmente usando la voz de <strong>Microsoft Edge</strong> para seguir hablando contigo.
+    </div>
+
+    <div class="recommendations">
+      <div class="rec-title">
+        <i class="fas fa-lightbulb"></i> Opciones Recomendadas
+      </div>
+      <div class="rec-item">
+        <i class="fas fa-check"></i>
+        <span><strong>Microsoft Edge TTS:</strong> Voces neuronales de alta calidad, totalmente gratuitas y sin cuotas de uso diario.</span>
+      </div>
+      <div class="rec-item">
+        <i class="fas fa-check"></i>
+        <span><strong>Piper TTS:</strong> Motor local 100% offline y privado, libre de problemas de conexión.</span>
+      </div>
+    </div>
+
+    <button class="btn" onclick="goToConfig()">Ir a Configuración</button>
+    <div class="close-btn" onclick="window.close()">Cerrar Alerta</div>
+  </div>
+
+  <script>
+    function goToConfig() {
+      // Navigate the window to the configuration page
+      window.location.href = "/config_page";
+    }
+  </script>
+</body>
+</html>

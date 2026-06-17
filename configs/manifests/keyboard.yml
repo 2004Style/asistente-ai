@@ -1,0 +1,26 @@
+# Manifest describing keyboard tool actions.
+name: keyboard_tools
+description: Herramientas para simular pulsaciones de teclas y combinaciones de atajos.
+version: 1.0.0
+actions:
+  type_text:
+    description: Escribe una cadena de texto simulando la entrada física del teclado. Puede requerir confirmación si el destino es sensible.
+    parameters:
+      text: string
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  press_key:
+    description: Presiona una sola tecla del teclado (ej. Return, space, Escape).
+    parameters:
+      key: string
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  shortcut:
+    description: Dispara una combinación de teclas simultáneas (ej. ctrl+c, alt+tab).
+    parameters:
+      keys: array
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]

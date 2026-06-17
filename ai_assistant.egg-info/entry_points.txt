@@ -1,0 +1,2 @@
+[console_scripts]
+rbot = cli.main:main

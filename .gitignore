@@ -1,0 +1,62 @@
+# Git ignore rules for the AI assistant project
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# PyInstaller / Packaging
+build/
+dist/
+*.spec
+
+.venv/
+venv/
+env/
+
+# Ignore env files
+.env
+.env.local
+.env.*.local
+!.env.example
+configs/chromium-panel-rbot/
+configs/chromium-hud-rbot/
+
+# Keep the directory structure inside 'data' but ignore actual downloaded files, databases, cache and logs
+data/*
+!data/**/.gitkeep
+
+# Specifying exceptions to ignore content inside data
+data/db/*
+!data/db/.gitkeep
+
+data/models/*
+!data/models/.gitkeep
+
+data/logs/*
+!data/logs/.gitkeep
+
+data/cache/*
+!data/cache/.gitkeep
+
+data/memories/*
+!data/memories/.gitkeep
+
+data/notes/*
+!data/notes/.gitkeep
+
+data/runtime/*
+!data/runtime/.gitkeep
+
+# OS generated files
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

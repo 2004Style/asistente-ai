@@ -1,0 +1,25 @@
+# Manifest describing application tool actions.
+name: application_tools
+description: Herramientas para listar, abrir y cerrar aplicaciones locales del sistema operativo.
+version: 1.0.0
+actions:
+  list_apps:
+    description: Lista todas las aplicaciones registradas en los directorios XDG o menús de inicio del sistema.
+    parameters: {}
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  open_app:
+    description: Lanza una aplicación local a partir de su ejecutable o alias del sistema.
+    parameters:
+      app_name: string
+    permission_level: medium
+    risk: execution
+    platforms: [linux, windows, macos]
+  close_app:
+    description: Finaliza un proceso de aplicación mediante su identificador o nombre.
+    parameters:
+      app_name: string
+    permission_level: medium
+    risk: modification
+    platforms: [linux, windows, macos]

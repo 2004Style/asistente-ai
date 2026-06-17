@@ -1,0 +1,2 @@
+2026-06-17 11:09:46 [INFO] VoiceManager: Initializing STT provider: 'gemini_stt'
+2026-06-17 11:09:46 [INFO] VoiceManager: Initializing TTS provider: 'gemini_live'

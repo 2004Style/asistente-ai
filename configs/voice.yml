@@ -1,0 +1,7 @@
+api_key: env:VOICE_API_KEY
+enabled: true
+push_to_talk: true
+stt_model: null
+stt_provider: vosk
+tts_provider: edge_tts
+tts_voice: es-ES-AlvaroNeural

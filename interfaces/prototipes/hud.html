@@ -1,0 +1,2757 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>J.A.R.V.I.S - Advanced System</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #0a0e17;
+        --cyan: #00d4ff;
+        --green: #00ff88;
+        --amber: #ffaa00;
+        --purple: #aa66ff;
+        --red: #ff3355;
+        --glass: rgba(10, 20, 40, 0.7);
+        --border: rgba(0, 212, 255, 1);
+        --text: rgba(0, 212, 255, 1);
+        --state-color: var(--cyan);
+        --state-glow: rgba(0, 212, 255, 1);
+        --ring-speed: 4s;
+        --muted: rgba(234, 255, 255, 0.56);
+        --panel: rgba(3, 18, 31, 0.58);
+        --dark: rgba(0, 8, 18, 0.78);
+      }
+      body {
+        background: var(--bg);
+        color: #fff;
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* HEADER */
+      .topbar {
+        position: relative;
+        z-index: 30;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        background: rgba(1, 8, 18, 0.68);
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+        pointer-events: auto;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(0, 245, 255, 0.42);
+        box-shadow: 0 0 7px rgba(0, 245, 255, 0.42);
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .brand span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .window-actions {
+        position: relative;
+        z-index: 80;
+        display: flex;
+        gap: 8px;
+        pointer-events: auto;
+      }
+
+      .window-btn {
+        position: relative;
+        z-index: 81;
+        width: 38px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(255, 255, 255, 0.055);
+        clip-path: polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+        cursor: pointer;
+        font-size: 13px;
+        pointer-events: auto;
+        user-select: none;
+      }
+
+      .window-btn.close {
+        color: rgba(255, 90, 120, 1);
+      }
+
+      /* MOCKUP HEADER (solo maqueta, quitar en produccion) */
+      .mockup-header {
+        position: absolute;
+        bottom: 0;
+        right: calc(50% - 160px);
+        height: 100px;
+        width: min-content;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        z-index: 100;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 14, 23, 0.95),
+          transparent
+        );
+        outline: 1px dashed rgba(255, 255, 0, 0.3);
+      }
+      .mockup-badge {
+        position: absolute;
+        top: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 9px;
+        letter-spacing: 2px;
+        background: rgba(255, 255, 0, 0.15);
+        color: rgba(255, 255, 0, 1);
+        padding: 1px 10px;
+        border: 1px solid rgba(255, 255, 0, 0.2);
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        z-index: 101;
+      }
+
+      .mockup-mode-toggle {
+        display: flex;
+        gap: 4px;
+        background: rgba(0, 212, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 3px;
+      }
+      .mockup-mode-btn {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        padding: 8px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s;
+        opacity: 0.5;
+      }
+      .mockup-mode-btn.active {
+        background: rgba(0, 212, 255, 0.15);
+        color: var(--cyan);
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+      }
+      .mockup-mode-btn:not(.active):hover {
+        opacity: 0.8;
+      }
+
+      .mockup-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .mockup-img-demo-btn {
+        background: rgba(0, 212, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        opacity: 0.5;
+      }
+      .mockup-img-demo-btn:hover {
+        background: rgba(0, 212, 255, 0.12);
+        color: var(--cyan);
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+      }
+      .mockup-state-indicators {
+        display: flex;
+        gap: 6px;
+      }
+      .mockup-state-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+      }
+      .mockup-state-dot:hover {
+        transform: scale(1.3);
+      }
+      .mockup-state-dot.active {
+        transform: scale(1.2);
+      }
+      .mockup-state-dot.waiting {
+        background: var(--cyan);
+        border-color: var(--cyan);
+        box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+      }
+      .mockup-state-dot.speaking {
+        background: var(--green);
+        border-color: var(--green);
+        box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+      }
+      .mockup-state-dot.listening {
+        background: var(--amber);
+        border-color: var(--amber);
+        box-shadow: 0 0 12px rgba(255, 170, 0, 0.4);
+      }
+      .mockup-state-dot.processing {
+        background: var(--purple);
+        border-color: var(--purple);
+        box-shadow: 0 0 12px rgba(170, 102, 255, 0.4);
+      }
+      .mockup-state-dot.error {
+        background: var(--red);
+        border-color: var(--red);
+        box-shadow: 0 0 12px rgba(255, 51, 85, 0.4);
+      }
+      .mockup-state-dot.active::after {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        border: 1px solid;
+        animation: dotRipple 1.5s ease-out infinite;
+        opacity: 0;
+      }
+      .mockup-state-dot.active.waiting::after {
+        border-color: var(--cyan);
+      }
+      .mockup-state-dot.active.speaking::after {
+        border-color: var(--green);
+      }
+      .mockup-state-dot.active.listening::after {
+        border-color: var(--amber);
+      }
+      .mockup-state-dot.active.processing::after {
+        border-color: var(--purple);
+      }
+      .mockup-state-dot.active.error::after {
+        border-color: var(--red);
+      }
+
+      /* MAIN LAYOUT */
+      .main-content {
+        position: fixed;
+        inset: 60px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        overflow: hidden;
+      }
+
+      /* CORE CONTAINER */
+      .core-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+      }
+      #coreCanvas {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* CORE - MAIN */
+      .core-container {
+        position: relative;
+        width: 320px;
+        height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2;
+        filter: drop-shadow(0 0 22px rgba(0, 212, 255, 0.22));
+      }
+      .core-container-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        isolation: isolate;
+      }
+      .core-container-inner::before,
+      .core-container-inner::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .core-container-inner::after {
+        inset: 72px;
+        background:
+          radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent 54%),
+          repeating-radial-gradient(
+            circle,
+            rgba(0, 212, 255, 0.14) 0 1px,
+            transparent 1px 16px
+          );
+        mask-image: radial-gradient(circle, transparent 0 28%, #000 30% 64%, transparent 66%);
+        opacity: 0.36;
+        animation: coreGridPulse 3.2s ease-in-out infinite;
+      }
+
+      /* Ring layer */
+      .s-ring {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: ringRotate var(--speed) linear infinite;
+        pointer-events: none;
+        z-index: 1;
+        mix-blend-mode: screen;
+      }
+      .s-ring.ccw {
+        animation-direction: reverse;
+      }
+      .s-ring svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .s-ring svg circle,
+      .s-ring svg path {
+        fill: none;
+        stroke: var(--state-color);
+        transition:
+          stroke 0.5s,
+          opacity 0.5s,
+          filter 0.5s;
+        filter: drop-shadow(0 0 5px color-mix(in srgb, var(--state-glow) 72%, transparent));
+      }
+
+      /* R1: Thin dashed outer ring */
+      .s-ring.r1 {
+        --speed: 9s;
+      }
+      .s-ring.r1 svg {
+        width: 100%;
+        height: 100%;
+      }
+      .s-ring.r1 circle {
+        stroke-width: 4;
+        stroke-dasharray: 2 10 20 12;
+        stroke-linecap: square;
+        opacity: 0.62;
+      }
+
+      /* R2: 12 trapezoids close to R1 */
+      .s-ring.r2 {
+        --speed: 7s;
+      }
+      .s-ring.r2 .trap {
+        position: absolute;
+        width: 17px;
+        height: 7px;
+        left: calc(50% - 8.5px);
+        top: calc(50% - 3.5px);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--state-color) 18% 82%,
+          transparent
+        );
+        box-shadow: 0 0 8px color-mix(in srgb, var(--state-glow) 46%, transparent);
+        opacity: 0.62;
+        transition:
+          background 0.5s,
+          opacity 0.5s;
+        animation: dataBlink 2.6s steps(2, end) infinite;
+      }
+
+      /* R3: Thick 3/4 arc */
+      .s-ring.r3 {
+        --speed: 5s;
+      }
+      .s-ring.r3 svg {
+        width: 90%;
+        height: 90%;
+      }
+      .s-ring.r3 circle {
+        stroke-width: 5;
+        stroke-dasharray: 68 42 16 132;
+        stroke-linecap: round;
+        opacity: 0.68;
+        filter: drop-shadow(0 0 6px var(--state-glow));
+      }
+
+      /* R4: 12 rectangles */
+      .s-ring.r4 {
+        --speed: 4s;
+      }
+      .s-ring.r4 .rect {
+        position: absolute;
+        width: 15px;
+        height: 10px;
+        left: calc(50% - 7.5px);
+        top: calc(50% - 5px);
+        border: 1px solid var(--state-color);
+        background:
+          linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.5) 49% 51%, transparent 52%),
+          color-mix(in srgb, var(--state-color) 18%, transparent 82%);
+        opacity: 0.55;
+        border-radius: 2px;
+        box-shadow:
+          inset 0 0 10px color-mix(in srgb, var(--state-glow) 30%, transparent),
+          0 0 10px color-mix(in srgb, var(--state-glow) 36%, transparent);
+        transition:
+          border 0.5s,
+          opacity 0.5s;
+      }
+
+      /* R5: Plasma Capsule Ring */
+      .s-ring.r5 {
+        --speed: 6s;
+      }
+      .s-ring.r5 svg {
+        width: 43%;
+        height: 43%;
+        overflow: visible;
+      }
+      .s-ring.r5 .r5-track {
+        fill: none;
+        stroke: var(--state-color);
+        stroke-width: 1.5;
+        stroke-dasharray: 12 8 2 8;
+        opacity: 0.42;
+        transition: stroke 0.5s;
+      }
+      .s-ring.r5 .r5-cap {
+        fill: var(--state-color);
+        transition: fill 0.5s;
+        animation: r5Blip 2s ease-in-out infinite;
+      }
+      .s-ring.r5 .r5-dot {
+        fill: var(--state-color);
+        transition: fill 0.5s;
+        animation: r5Blip 2s ease-in-out infinite;
+        animation-delay: -1s;
+      }
+      @keyframes r5Blip {
+        0%,
+        100% {
+          opacity: 0.15;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* R6: Round dot chain */
+      .s-ring.r6 {
+        --speed: 3s;
+      }
+      .s-ring.r6 svg {
+        width: 60%;
+        height: 60%;
+      }
+      .s-ring.r6 circle {
+        stroke-width: 8;
+        stroke-dasharray: 1 11;
+        stroke-linecap: round;
+        opacity: 0.62;
+      }
+
+      /* R7: Symbols */
+      .s-ring.r7 {
+        --speed: 5.5s;
+      }
+      .s-ring.r7 .sym {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        left: calc(50% - 7px);
+        top: calc(50% - 7px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--state-color);
+        opacity: 0.78;
+        text-shadow: 0 0 10px var(--state-glow);
+        transition:
+          color 0.5s,
+          opacity 0.5s;
+      }
+
+      /* R8: Fine dotted circle for density */
+      .s-ring.r8 {
+        --speed: 4.5s;
+      }
+      .s-ring.r8 svg {
+        width: 44%;
+        height: 44%;
+      }
+      .s-ring.r8 circle {
+        stroke-width: 1;
+        stroke-dasharray: 1 7;
+        opacity: 0.38;
+      }
+
+      /* R9: Inner dashed ring */
+      .s-ring.r9 {
+        --speed: 3.5s;
+      }
+      .s-ring.r9 svg {
+        width: 32%;
+        height: 32%;
+      }
+      .s-ring.r9 circle {
+        stroke-width: 56;
+        stroke-dasharray: 1 13;
+        opacity: 0.2;
+      }
+
+      /* Core orb - flat circle with tech effects */
+      .core-orb {
+        position: relative;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.86), transparent 12%),
+          radial-gradient(circle at 50% 50%, var(--state-color), rgba(13, 5, 40, 0.82) 48%, rgba(0, 7, 18, 0.94) 72%);
+        border: 1px solid color-mix(in srgb, var(--state-color) 82%, white 18%);
+        box-shadow:
+          0 0 20px var(--state-glow),
+          0 0 64px color-mix(in srgb, var(--state-glow) 42%, transparent),
+          inset 0 0 20px rgba(255, 255, 255, 0.16),
+          inset 0 -12px 28px rgba(0, 0, 0, 0.45);
+        transition: all 0.5s;
+        z-index: 3;
+        animation: coreBreath 2.8s ease-in-out infinite;
+      }
+      .core-orb-inner {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          var(--state-color) 45deg,
+          transparent 90deg,
+          transparent 180deg,
+          var(--state-color) 225deg,
+          transparent 270deg,
+          transparent 360deg
+        );
+        opacity: 1;
+        animation: orbScan 3s linear infinite;
+      }
+      .core-orb::after {
+        content: "";
+        position: absolute;
+        inset: -16px;
+        border-radius: 50%;
+        border: 1px dashed var(--state-color);
+        opacity: 0.08;
+        animation: ringRotate 9s linear infinite reverse;
+      }
+      .core-orb .orb-cross {
+        position: absolute;
+        inset: 25%;
+        border-radius: 50%;
+        border: 1px solid var(--state-color);
+        opacity: 0.12;
+      }
+      .core-orb .orb-cross::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -30%;
+        right: -30%;
+        height: 1px;
+        background: var(--state-color);
+        opacity: 0.08;
+      }
+      .core-orb .orb-cross::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: -30%;
+        bottom: -30%;
+        width: 1px;
+        background: var(--state-color);
+        opacity: 0.08;
+      }
+      .core-orb .orb-needle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 28px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--state-color));
+        opacity: 0.15;
+        transform-origin: 0 0;
+        animation: orbNeedle 2s linear infinite;
+        border-radius: 0 2px 2px 0;
+      }
+      @keyframes orbScan {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes orbNeedle {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes ringRotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes coreGridPulse {
+        0%,
+        100% {
+          opacity: 0.24;
+          transform: scale(0.98);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(1.01);
+        }
+      }
+      @keyframes coreBreath {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.08);
+        }
+      }
+      @keyframes dataBlink {
+        0%,
+        44%,
+        100% {
+          opacity: 0.86;
+        }
+        45%,
+        58% {
+          opacity: 0.32;
+        }
+      }
+
+      /* STATE-SPECIFIC ANIMATIONS */
+      .core-container.waiting .s-ring {
+        animation-play-state: paused;
+      }
+      .core-container.waiting .core-orb {
+        animation-play-state: paused;
+      }
+      .core-container.waiting .core-orb::before,
+      .core-container.waiting .core-orb::after,
+      .core-container.waiting .core-orb .orb-needle,
+      .core-container.waiting .core-orb-inner {
+        animation-play-state: paused;
+      }
+      .core-container.waiting .s-ring .trap,
+      .core-container.waiting .s-ring .rect,
+      .core-container.waiting .s-ring .sym,
+      .core-container.waiting .s-ring .r5-cap,
+      .core-container.waiting .s-ring .r5-dot,
+      .core-container.waiting .s-ring svg circle,
+      .core-container.waiting .s-ring svg path {
+        opacity: 0.2;
+      }
+      .core-container.waiting .core-orb::before,
+      .core-container.waiting .core-orb::after {
+        opacity: 0.06;
+      }
+      .core-container.waiting .s-ring .r5-cap,
+      .core-container.waiting .s-ring .r5-dot {
+        animation-play-state: paused;
+      }
+
+      .core-container.listening .s-ring {
+        animation-duration: calc(var(--speed) * 2) !important;
+      }
+      .core-container.listening .s-ring .trap,
+      .core-container.listening .s-ring .rect,
+      .core-container.listening .s-ring .sym {
+        animation-duration: calc(var(--speed) * 2) !important;
+      }
+      .core-container.processing .s-ring {
+        animation-duration: calc(var(--speed) * 0.2) !important;
+      }
+      .core-container.processing .s-ring .trap,
+      .core-container.processing .s-ring .rect,
+      .core-container.processing .s-ring .sym {
+        animation-duration: calc(var(--speed) * 0.2) !important;
+      }
+
+      .core-container.error .core-orb {
+        opacity: 0.7;
+      }
+      .core-container.error .s-ring .trap,
+      .core-container.error .s-ring .rect,
+      .core-container.error .s-ring .sym,
+      .core-container.error .s-ring .r5-cap,
+      .core-container.error .s-ring svg circle,
+      .core-container.error .s-ring svg path {
+        opacity: 0.35;
+      }
+
+      /* SIDEBAR LEFT - hologram panels */
+      .sidebar-left {
+        position: fixed;
+        left: 0;
+        top: 60px;
+        bottom: 0;
+        width: 280px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+        z-index: 10;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      .hologram-panel {
+        pointer-events: auto;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        background:
+          linear-gradient(145deg, rgba(0, 212, 255, 0.08), transparent 42%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 18%),
+          rgba(2, 11, 24, 0.72);
+        border: 1px solid rgba(0, 212, 255, 0.38);
+        border-radius: 6px;
+        backdrop-filter: blur(14px);
+        position: relative;
+        overflow: hidden;
+        clip-path: polygon(
+          0 14px,
+          14px 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% calc(100% - 16px),
+          calc(100% - 16px) 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+        box-shadow:
+          0 0 18px rgba(0, 212, 255, 0.06),
+          inset 0 0 20px rgba(0, 212, 255, 0.035),
+          inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      }
+      .hologram-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(rgba(0, 212, 255, 0.045) 1px, transparent 1px);
+        background-size: 20px 20px;
+        mask-image: linear-gradient(180deg, #000, transparent 92%);
+        opacity: 0.3;
+        pointer-events: none;
+      }
+      .hologram-panel::after {
+        content: "";
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 9px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.42), transparent);
+        opacity: 0.62;
+      }
+      .panel-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px 8px;
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(0, 212, 255, 1);
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.42);
+      }
+      .panel-header i {
+        font-size: 10px;
+        opacity: 0.9;
+        width: 18px;
+        height: 18px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(0, 212, 255, 0.28);
+        border-radius: 4px;
+        background: rgba(0, 212, 255, 0.08);
+      }
+      .panel-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2px 10px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        scrollbar-width: none;
+        position: relative;
+        z-index: 1;
+      }
+      .panel-body::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Hologram input */
+      .hologram-input {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.1), transparent 38%),
+          rgba(3, 13, 28, 0.68);
+        border: 1px solid rgba(0, 212, 255, 0.48);
+        border-radius: 7px;
+        backdrop-filter: blur(14px);
+        transition:
+          border-color 0.3s,
+          box-shadow 0.3s;
+        min-height: 40px;
+        clip-path: polygon(0 9px, 9px 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        box-shadow:
+          inset 0 0 16px rgba(0, 212, 255, 0.045),
+          0 0 18px rgba(0, 212, 255, 0.06);
+      }
+      .hologram-input:focus-within {
+        border-color: rgba(0, 255, 136, 0.62);
+        box-shadow:
+          inset 0 0 20px rgba(0, 255, 136, 0.06),
+          0 0 26px rgba(0, 255, 136, 0.12);
+      }
+      .hologram-input input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: rgba(255, 255, 255, 1);
+        font-size: 11px;
+        padding: 6px 8px;
+        font-family: inherit;
+        letter-spacing: 0.5px;
+      }
+      .hologram-input input::placeholder {
+        color: rgba(0, 212, 255, 1);
+        font-size: 10px;
+        letter-spacing: 1px;
+      }
+      .hologram-input button {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.18), rgba(0, 212, 255, 0.1));
+        border: 1px solid rgba(0, 255, 136, 0.58);
+        color: var(--cyan);
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+      .hologram-input button:hover {
+        background: rgba(0, 212, 255, 0.18);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.12);
+      }
+
+      /* SIDEBAR RIGHT - system monitor */
+      .sidebar-right {
+        position: fixed;
+        right: 0;
+        top: 60px;
+        bottom: 0;
+        width: min-content;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        z-index: 10;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      .sys-widget {
+        pointer-events: auto;
+        min-width: 68px;
+        background:
+          linear-gradient(135deg, rgba(0, 212, 255, 0.14), transparent 54%),
+          rgba(2, 14, 27, 0.72);
+        border: 1px solid rgba(0, 212, 255, 0.48);
+        border-radius: 5px;
+        padding: 8px 9px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        backdrop-filter: blur(14px);
+        position: relative;
+        overflow: hidden;
+        clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+        box-shadow:
+          inset 0 0 18px rgba(0, 212, 255, 0.045),
+          0 0 18px rgba(0, 212, 255, 0.07);
+      }
+      .sys-widget::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 34%),
+          linear-gradient(180deg, rgba(0, 212, 255, 0.16), transparent 1px);
+        pointer-events: none;
+      }
+      .sys-widget::after {
+        content: "";
+        position: absolute;
+        right: 7px;
+        bottom: 6px;
+        width: 18px;
+        height: 2px;
+        background: rgba(0, 212, 255, 0.45);
+        box-shadow: -7px 0 0 rgba(0, 212, 255, 0.18);
+        pointer-events: none;
+      }
+      .sys-header {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 8px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: rgba(0, 212, 255, 1);
+        position: relative;
+        z-index: 1;
+      }
+      .sys-header i {
+        font-size: 10px;
+        width: 13px;
+        text-align: center;
+      }
+
+      .sys-value {
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(0, 212, 255, 1);
+        font-family: monospace;
+        letter-spacing: 1px;
+        text-wrap: nowrap;
+        position: relative;
+        z-index: 1;
+      }
+
+      .sys-widget.net {
+        border-color: rgba(0, 255, 136, 0.46);
+        background:
+          linear-gradient(135deg, rgba(0, 255, 136, 0.14), transparent 54%),
+          rgba(2, 16, 22, 0.72);
+      }
+      .sys-widget.net .sys-header,
+      .sys-widget.net .sys-value {
+        color: rgba(0, 255, 136, 1);
+      }
+
+      .sys-widget.gpu {
+        border-color: rgba(170, 102, 255, 0.5);
+        background:
+          linear-gradient(135deg, rgba(170, 102, 255, 0.16), transparent 54%),
+          rgba(12, 8, 28, 0.72);
+      }
+      .sys-widget.gpu .sys-header,
+      .sys-widget.gpu .sys-value {
+        color: rgba(170, 102, 255, 1);
+      }
+
+      /* Messages inside hologram panels */
+      .msg {
+        position: relative;
+        font-size: 10.5px;
+        padding: 8px 9px 8px 11px;
+        border-radius: 5px;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.12), transparent 68%),
+          rgba(0, 212, 255, 0.035);
+        border: 1px solid rgba(0, 212, 255, 0.18);
+        border-left: 2px solid rgba(0, 255, 136, 0.68);
+        opacity: 0;
+        transform: translateY(6px) scale(0.985);
+        animation: msgIn 0.28s ease-out forwards;
+        line-height: 1.3;
+        color: rgba(0, 212, 255, 1);
+        flex-shrink: 0;
+        width: 100%;
+        box-shadow:
+          inset 0 0 14px rgba(0, 212, 255, 0.035),
+          0 0 12px rgba(0, 212, 255, 0.04);
+      }
+      .msg::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        right: 5px;
+        width: 18px;
+        height: 1px;
+        background: rgba(0, 255, 136, 0.42);
+        box-shadow: 0 4px 0 rgba(0, 212, 255, 0.18);
+      }
+      .msg.jarvis {
+        background:
+          linear-gradient(90deg, rgba(170, 102, 255, 0.15), transparent 70%),
+          rgba(170, 102, 255, 0.04);
+        border-color: rgba(170, 102, 255, 0.2);
+        border-left-color: rgba(170, 102, 255, 0.76);
+        color: rgba(170, 102, 255, 1);
+      }
+      @keyframes msgIn {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .core-container {
+        transition:
+          transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.6s,
+          height 0.6s;
+      }
+
+      /* CAMERA MODE */
+      .camera-view {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        opacity: 0;
+        overflow: hidden;
+        pointer-events: none;
+        transition: opacity 0.7s ease;
+      }
+      .camera-view.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .camera-feed {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+        filter: brightness(0.7) contrast(1.2) hue-rotate(190deg) saturate(0.5);
+      }
+      .camera-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 14, 23, 0.3),
+          transparent 30%,
+          transparent 70%,
+          rgba(10, 14, 23, 0.5)
+        );
+        pointer-events: none;
+      }
+      .camera-corners {
+        position: absolute;
+        inset: 20px;
+        pointer-events: none;
+      }
+      .camera-corners::before,
+      .camera-corners::after {
+        content: "";
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-color: var(--cyan);
+        border-style: solid;
+        opacity: 0.3;
+      }
+      .camera-corners::before {
+        top: 0;
+        left: 0;
+        border-width: 2px 0 0 2px;
+      }
+      .camera-corners::after {
+        top: 0;
+        right: 0;
+        border-width: 2px 2px 0 0;
+      }
+      .camera-corners :nth-child(2) {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--cyan);
+        border-width: 0 0 2px 2px;
+        opacity: 0.3;
+      }
+      .camera-corners :nth-child(3) {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--cyan);
+        border-width: 0 2px 2px 0;
+        opacity: 0.3;
+      }
+
+      /* IMAGE DISPLAY - holographic projection from core */
+      .image-display {
+        position: fixed;
+        inset: 0;
+        z-index: 15;
+        display: none;
+        pointer-events: none;
+      }
+      .image-display.active {
+        display: block;
+        pointer-events: auto;
+      }
+      .image-card {
+        position: fixed;
+        background:
+          linear-gradient(145deg, rgba(0, 212, 255, 0.12), transparent 42%),
+          linear-gradient(315deg, rgba(0, 255, 136, 0.08), transparent 48%),
+          rgba(5, 10, 20, 0.94);
+        border: 1px solid rgba(0, 212, 255, 0.72);
+        backdrop-filter: blur(8px) saturate(1.2);
+        pointer-events: auto;
+        box-shadow:
+          0 0 44px rgba(0, 212, 255, 0.14),
+          0 0 90px rgba(0, 255, 136, 0.06),
+          inset 0 0 34px rgba(0, 212, 255, 0.045);
+        opacity: 0;
+        filter: brightness(1.08) contrast(1.06);
+        animation: imageCardFade 0.22s ease-out forwards;
+      }
+      .image-card::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border: 1px solid rgba(0, 212, 255, 0.86);
+        clip-path: polygon(0 0, 34% 0, 34% 1px, 0 1px, 0 100%, 1px 100%, 1px 0);
+        pointer-events: none;
+      }
+      .image-card::after {
+        display: none;
+      }
+      @keyframes imageCardFade {
+        0% {
+          opacity: 0;
+          filter: brightness(1.18) contrast(1.08);
+        }
+        100% {
+          opacity: 1;
+          filter: brightness(1) contrast(1);
+        }
+      }
+      .image-card .img-wrapper {
+        position: relative;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.035);
+      }
+      .image-card .img-wrapper .img-placeholder {
+        position: relative;
+        z-index: 1;
+        clip-path: inset(0 0 100% 0);
+        will-change: clip-path, opacity;
+        animation: imageContentReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .image-card .img-wrapper .img-placeholder img {
+        width: 100%;
+        display: block;
+        object-fit: contain;
+        opacity: 0.88;
+        filter: saturate(1.18) contrast(1.12) brightness(0.88);
+        max-height: 260px;
+      }
+      @keyframes imageContentReveal {
+        0% {
+          clip-path: inset(0 0 100% 0);
+          opacity: 0.2;
+        }
+        100% {
+          clip-path: inset(0 0 0 0);
+          opacity: 1;
+        }
+      }
+      .image-card .img-wrapper .img-tech-overlay {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(rgba(0, 212, 255, 0.07) 1px, transparent 1px),
+          radial-gradient(circle at 15% 10%, rgba(0, 255, 136, 0.13), transparent 32%);
+        background-size: 18px 18px, 18px 18px, auto;
+        pointer-events: none;
+        mix-blend-mode: overlay;
+        z-index: 2;
+        opacity: 0.7;
+      }
+      .image-card .img-wrapper .img-scanline {
+        display: none;
+      }
+      .image-card .img-wrapper .img-corner {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-color: rgba(0, 212, 255, 0.25);
+        border-style: solid;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .image-card .img-wrapper .img-corner.tl {
+        top: 3px;
+        left: 3px;
+        border-width: 1px 0 0 1px;
+      }
+      .image-card .img-wrapper .img-corner.tr {
+        top: 3px;
+        right: 3px;
+        border-width: 1px 1px 0 0;
+      }
+      .image-card .img-wrapper .img-corner.bl {
+        bottom: 3px;
+        left: 3px;
+        border-width: 0 0 1px 1px;
+      }
+      .image-card .img-wrapper .img-corner.br {
+        bottom: 3px;
+        right: 3px;
+        border-width: 0 1px 1px 0;
+      }
+      .image-card .img-wrapper .img-beam {
+        display: none;
+      }
+      .image-card-close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 51, 85, 1);
+        color: rgba(255, 51, 85, 1);
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        border-radius: 2px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .image-card:hover .image-card-close,
+      .image-card:hover .image-card-web {
+        opacity: 1;
+      }
+      .image-card-close:hover {
+        background: rgba(255, 51, 85, 0.2);
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .image-card-web {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(0, 212, 255, 1);
+        color: rgba(0, 212, 255, 1);
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        border-radius: 2px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .image-card-web:hover {
+        background: rgba(0, 212, 255, 0.15);
+        color: var(--cyan);
+        border-color: var(--cyan);
+      }
+      /* Connector beam from core to card */
+      .connector-beam {
+        position: fixed;
+        pointer-events: none;
+        z-index: 14;
+        display: none;
+      }
+      .connector-beam.active {
+        display: block;
+      }
+      .connector-beam canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* PROCESS ORBIT */
+      .process-orbit {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+      .process-node {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        opacity: 0;
+      }
+      .process-node.active {
+        opacity: 1;
+      }
+      .process-node .node-core {
+        position: absolute;
+        inset: 2px;
+        background: var(--cyan);
+        border-radius: 1px;
+        box-shadow:
+          0 0 6px var(--cyan),
+          inset 0 0 4px rgba(0, 212, 255, 0.5);
+      }
+      .process-node .node-ring {
+        position: absolute;
+        inset: 0;
+        border: 1px solid rgba(0, 212, 255, 1);
+        border-radius: 1px;
+        transform: rotate(45deg);
+      }
+      .process-node .node-label {
+        position: absolute;
+        left: 16px;
+        top: -2px;
+        font-family: monospace;
+        font-size: 7px;
+        color: rgba(0, 212, 255, 1);
+        letter-spacing: 1px;
+        white-space: nowrap;
+      }
+      .process-node.trail {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 4px var(--cyan);
+        opacity: 0;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        .mockup-header {
+          padding: 0 15px;
+          height: 50px;
+        }
+        .main-content {
+          top: 50px;
+        }
+        .mockup-logo span {
+          display: none;
+        }
+        .mockup-state-indicators {
+          gap: 4px;
+        }
+        .mockup-state-dot {
+          width: 8px;
+          height: 8px;
+        }
+        .core-container {
+          width: 220px;
+          height: 220px;
+        }
+        .core-orb {
+          width: 45px;
+          height: 45px;
+        }
+        .sidebar-left {
+          width: 200px;
+          padding: 8px;
+          gap: 6px;
+        }
+        .sidebar-right {
+          width: 140px;
+          padding: 8px;
+          gap: 5px;
+        }
+        .sys-widget {
+          padding: 6px 8px;
+        }
+        .mockup-mode-btn {
+          padding: 6px 12px;
+          font-size: 10px;
+        }
+        .mockup-img-demo-btn {
+          width: 28px;
+          height: 28px;
+          font-size: 11px;
+        }
+        .image-card {
+          max-width: 90%;
+        }
+        .image-card .img-wrapper .img-placeholder img {
+          max-height: 160px;
+        }
+        .image-card .img-wrapper {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-mark" src="../assets/logo.png" alt="Brand Mark" />
+        <div>
+          <h1>2004Style Assistant</h1>
+          <span>Neural Command Interface</span>
+        </div>
+      </div>
+
+      <div class="window-actions">
+        <button
+          class="window-btn"
+          data-window-action="minimize"
+          type="button"
+          title="Minimizar"
+          aria-label="Minimizar"
+        >
+          —
+        </button>
+        <button
+          class="window-btn"
+          data-window-action="maximize"
+          type="button"
+          title="Maximizar"
+          aria-label="Maximizar"
+        >
+          □
+        </button>
+        <button
+          class="window-btn close"
+          data-window-action="close"
+          type="button"
+          title="Cerrar"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+      </div>
+    </header>
+    <!-- MOCKUP-HEADER (solo maqueta, reemplazar por <header> real) -->
+    <div class="mockup-header">
+      <div class="mockup-badge">MOCKUP</div>
+
+      <div class="mockup-mode-toggle">
+        <button class="mockup-mode-btn active" data-mode="core">
+          <i class="fas fa-circle"></i> Core
+        </button>
+        <button class="mockup-mode-btn" data-mode="camera">
+          <i class="fas fa-camera"></i> Camera
+        </button>
+      </div>
+      <div class="mockup-header-actions">
+        <button
+          class="mockup-img-demo-btn"
+          id="imgDemoBtn"
+          title="Vista previa de imagen"
+        >
+          <i class="fas fa-image"></i>
+        </button>
+        <button
+          class="mockup-img-demo-btn"
+          id="procDemoBtn"
+          title="Procesos en segundo plano"
+        >
+          <i class="fas fa-microchip"></i>
+        </button>
+      </div>
+      <div class="mockup-state-indicators">
+        <div
+          class="mockup-state-dot waiting active"
+          data-state="waiting"
+          title="Espera"
+        ></div>
+        <div
+          class="mockup-state-dot speaking"
+          data-state="speaking"
+          title="Hablando"
+        ></div>
+        <div
+          class="mockup-state-dot listening"
+          data-state="listening"
+          title="Escuchando"
+        ></div>
+        <div
+          class="mockup-state-dot processing"
+          data-state="processing"
+          title="Procesando"
+        ></div>
+        <div
+          class="mockup-state-dot error"
+          data-state="error"
+          title="Error"
+        ></div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+      <!-- CORE SECTION -->
+      <div class="core-section" id="coreSection">
+        <div class="core-container waiting" id="coreContainer">
+          <div class="core-container-inner">
+            <!-- R1: Thin dashed outer ring (SVG) -->
+            <div class="s-ring r1 cw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="155" />
+              </svg>
+            </div>
+
+            <!-- R2: 36 trapezoids close to R1 -->
+            <div class="s-ring r2 ccw">
+              <div
+                class="trap"
+                style="transform: rotate(0deg) translateY(-140px) skewX(-40deg)"
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(10deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(20deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(30deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(40deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(50deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(60deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(70deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(80deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(90deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(100deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(110deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(120deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(130deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(140deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(150deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(160deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(170deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(180deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(190deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(200deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(210deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(220deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(230deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(240deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(250deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(260deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(270deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(280deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(290deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(300deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(310deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(320deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(330deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(340deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+              <div
+                class="trap"
+                style="
+                  transform: rotate(350deg) translateY(-140px) skewX(-40deg);
+                "
+              ></div>
+            </div>
+
+            <!-- R3: Thick 3/4 arc (SVG) -->
+            <div class="s-ring r3 ccw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="135" />
+              </svg>
+            </div>
+
+            <!-- R4: 18 rectangles -->
+            <div class="s-ring r4 cw">
+              <div
+                class="rect"
+                style="transform: rotate(0deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(20deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(40deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(60deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(80deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(100deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(120deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(140deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(160deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(180deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(200deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(220deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(240deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(260deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(280deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(300deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(320deg) translateY(-100px)"
+              ></div>
+              <div
+                class="rect"
+                style="transform: rotate(340deg) translateY(-100px)"
+              ></div>
+            </div>
+
+            <!-- R5: Plasma Capsule Ring -->
+            <div class="s-ring r5 ccw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="110" class="r5-track" />
+                <g transform="rotate(0, 160, 160)">
+                  <rect
+                    class="r5-cap"
+                    x="153"
+                    y="47"
+                    width="14"
+                    height="6"
+                    rx="3"
+                  />
+                </g>
+                <g transform="rotate(30, 160, 160)">
+                  <circle class="r5-dot" cx="160" cy="50" r="3" />
+                </g>
+                <g transform="rotate(60, 160, 160)">
+                  <rect
+                    class="r5-cap"
+                    x="153"
+                    y="47"
+                    width="14"
+                    height="6"
+                    rx="3"
+                  />
+                </g>
+                <g transform="rotate(90, 160, 160)">
+                  <circle class="r5-dot" cx="160" cy="50" r="3" />
+                </g>
+                <g transform="rotate(120, 160, 160)">
+                  <rect
+                    class="r5-cap"
+                    x="153"
+                    y="47"
+                    width="14"
+                    height="6"
+                    rx="3"
+                  />
+                </g>
+                <g transform="rotate(150, 160, 160)">
+                  <circle class="r5-dot" cx="160" cy="50" r="3" />
+                </g>
+                <g transform="rotate(180, 160, 160)">
+                  <rect
+                    class="r5-cap"
+                    x="153"
+                    y="47"
+                    width="14"
+                    height="6"
+                    rx="3"
+                  />
+                </g>
+                <g transform="rotate(210, 160, 160)">
+                  <circle class="r5-dot" cx="160" cy="50" r="3" />
+                </g>
+                <g transform="rotate(240, 160, 160)">
+                  <rect
+                    class="r5-cap"
+                    x="153"
+                    y="47"
+                    width="14"
+                    height="6"
+                    rx="3"
+                  />
+                </g>
+                <g transform="rotate(270, 160, 160)">
+                  <circle class="r5-dot" cx="160" cy="50" r="3" />
+                </g>
+                <g transform="rotate(300, 160, 160)">
+                  <rect
+                    class="r5-cap"
+                    x="153"
+                    y="47"
+                    width="14"
+                    height="6"
+                    rx="3"
+                  />
+                </g>
+                <g transform="rotate(330, 160, 160)">
+                  <circle class="r5-dot" cx="160" cy="50" r="3" />
+                </g>
+              </svg>
+            </div>
+
+            <!-- R6: Dot chain (SVG) -->
+            <div class="s-ring r6 cw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="96" />
+              </svg>
+            </div>
+
+            <!-- R7: 6 symbols -->
+            <div class="s-ring r7 ccw">
+              <div
+                class="sym"
+                style="transform: rotate(0deg) translateY(-78px) rotate(0deg)"
+              >
+                ◆
+              </div>
+              <div
+                class="sym"
+                style="
+                  transform: rotate(60deg) translateY(-78px) rotate(-60deg);
+                "
+              >
+                ◇
+              </div>
+              <div
+                class="sym"
+                style="
+                  transform: rotate(120deg) translateY(-78px) rotate(-120deg);
+                "
+              >
+                ◆
+              </div>
+              <div
+                class="sym"
+                style="
+                  transform: rotate(180deg) translateY(-78px) rotate(-180deg);
+                "
+              >
+                ◇
+              </div>
+              <div
+                class="sym"
+                style="
+                  transform: rotate(240deg) translateY(-78px) rotate(-240deg);
+                "
+              >
+                ◆
+              </div>
+              <div
+                class="sym"
+                style="
+                  transform: rotate(300deg) translateY(-78px) rotate(-300deg);
+                "
+              >
+                ◇
+              </div>
+            </div>
+
+            <!-- R8: Fine dotted circle -->
+            <div class="s-ring r8 cw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="70" />
+              </svg>
+            </div>
+
+            <!-- R9: Inner dashed ring -->
+            <div class="s-ring r9 ccw">
+              <svg viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="51" />
+              </svg>
+            </div>
+
+            <div class="core-orb">
+              <div class="core-orb-inner"></div>
+              <div class="orb-cross"></div>
+              <div class="orb-needle"></div>
+            </div>
+            <div class="process-orbit" id="processOrbit"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEFT SIDEBAR - hologram panels -->
+      <div class="sidebar-left">
+        <div class="hologram-panel" id="userPanelContainer">
+          <div class="panel-header"><i class="fas fa-user"></i> Mi señal</div>
+          <div class="panel-body" id="userPanel"></div>
+        </div>
+        <div class="hologram-panel" id="jarvisPanelContainer">
+          <div class="panel-header">
+            <i class="fas fa-robot"></i> ASISTENTE
+          </div>
+          <div class="panel-body" id="jarvisPanel"></div>
+        </div>
+        <div class="hologram-input">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Interfaz neuronal..."
+            autofocus
+          />
+          <button id="btnSend"><i class="fas fa-arrow-up"></i></button>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR - system monitor -->
+      <div class="sidebar-right">
+        <div class="sys-widget cpu">
+          <div class="sys-header"><i class="fas fa-microchip"></i> CPU</div>
+          <span class="sys-value" id="cpuValue">0%</span>
+        </div>
+        <div class="sys-widget gpu">
+          <div class="sys-header"><i class="fas fa-server"></i> GPU</div>
+          <span class="sys-value" id="gpuValue">0%</span>
+        </div>
+        <div class="sys-widget ram">
+          <div class="sys-header"><i class="fas fa-memory"></i> RAM</div>
+          <span class="sys-value" id="ramValue">0 GB</span>
+        </div>
+        <div class="sys-widget net">
+          <div class="sys-header"><i class="fas fa-wifi"></i> Red</div>
+          <span class="sys-value" id="netValue">0 Mbps</span>
+        </div>
+      </div>
+
+      <!-- CAMERA VIEW (inside main-content) -->
+      <div class="camera-view" id="cameraView">
+        <video class="camera-feed" id="cameraFeed" autoplay playsinline></video>
+        <div class="camera-overlay"></div>
+        <div class="camera-corners">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGE DISPLAY - holographic projection -->
+    <div class="image-display" id="imageDisplay">
+      <div class="connector-beam" id="connectorBeam">
+        <canvas id="beamCanvas"></canvas>
+      </div>
+      <div class="image-card" id="imageCard">
+        <div class="img-wrapper">
+          <div class="img-placeholder" id="imgPlaceholder"></div>
+          <div class="img-tech-overlay"></div>
+          <div class="img-scanline"></div>
+          <div class="img-corner tl"></div>
+          <div class="img-corner tr"></div>
+          <div class="img-corner bl"></div>
+          <div class="img-corner br"></div>
+          <div class="img-beam"></div>
+          <button class="image-card-close" id="imgClose">
+            <i class="fas fa-times"></i>
+          </button>
+          <button class="image-card-web" id="imgWebBtn">
+            <i class="fas fa-external-link-alt"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANVAS PARTICLES -->
+    <canvas id="coreCanvas"></canvas>
+
+    <script>
+      // ========== STATE MANAGEMENT ==========
+      const STATE = {
+        current: "waiting",
+        config: {
+          waiting: {
+            color: "#4a5568",
+            name: "ESPERA",
+            ringSpeed: 4,
+            pulseSpeed: 3,
+          },
+          speaking: {
+            color: "#00ff88",
+            name: "HABLANDO",
+            ringSpeed: 2,
+            pulseSpeed: 0.6,
+          },
+          listening: {
+            color: "#ffaa00",
+            name: "ESCUCHANDO",
+            ringSpeed: 1.5,
+            pulseSpeed: 0.3,
+          },
+          processing: {
+            color: "#aa66ff",
+            name: "PROCESANDO",
+            ringSpeed: 0.8,
+            pulseSpeed: 0.2,
+          },
+          error: {
+            color: "#ff3355",
+            name: "ERROR",
+            ringSpeed: 0.3,
+            pulseSpeed: 0.1,
+          },
+        },
+      };
+
+      function setState(state) {
+        STATE.current = state;
+        const cfg = STATE.config[state];
+        const root = document.documentElement;
+        root.style.setProperty("--state-color", cfg.color);
+        root.style.setProperty("--state-glow", cfg.color + "88");
+        root.style.setProperty("--ring-speed", cfg.ringSpeed + "s");
+        root.style.setProperty("--pulse-speed", cfg.pulseSpeed + "s");
+
+        document.querySelectorAll(".core-container").forEach((el) => {
+          el.className = "core-container " + state;
+        });
+        document.querySelectorAll(".state-dot").forEach((d) => {
+          d.classList.toggle("active", d.dataset.state === state);
+        });
+        document.querySelectorAll(".mockup-state-dot").forEach((d) => {
+          d.classList.toggle("active", d.dataset.state === state);
+        });
+      }
+
+      document.querySelectorAll(".state-dot").forEach((dot) => {
+        dot.addEventListener("click", () => setState(dot.dataset.state));
+      });
+      document.querySelectorAll(".mockup-state-dot").forEach((dot) => {
+        dot.addEventListener("click", () => setState(dot.dataset.state));
+      });
+
+      // ========== PARTICLES ==========
+      const canvas = document.getElementById("coreCanvas");
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+      let animFrame;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          const section = document.getElementById("coreSection");
+          const rect = section.getBoundingClientRect();
+          this.x = rect.left + rect.width / 2 + (Math.random() - 0.5) * 200;
+          this.y = rect.top + rect.height / 2 + (Math.random() - 0.5) * 200;
+          this.size = Math.random() * 2 + 1;
+          this.speedX = (Math.random() - 0.5) * 2;
+          this.speedY = (Math.random() - 0.5) * 2;
+          this.life = 1;
+          this.decay = 0.002 + Math.random() * 0.005;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          this.life -= this.decay;
+          if (this.life <= 0) this.reset();
+        }
+        draw() {
+          const cfg = STATE.config[STATE.current];
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle =
+            cfg.color +
+            Math.floor(this.life * 80)
+              .toString(16)
+              .padStart(2, "0");
+          ctx.fill();
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = cfg.color;
+        }
+      }
+
+      for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const isProcessing = STATE.current === "processing";
+        const isError = STATE.current === "error";
+        const particleCount = isProcessing ? 150 : isError ? 100 : 50;
+
+        while (particles.length < particleCount) particles.push(new Particle());
+        while (particles.length > particleCount) particles.pop();
+
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+        animFrame = requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      // ========== PROCESS NODES ==========
+      const processOrbit = document.getElementById("processOrbit");
+      let processNodes = [];
+      let processAnimFrame;
+
+      const PROC_COLOR = "#00d4ff";
+      let procCounter = 0;
+
+      function spawnProcess() {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 100 + Math.random() * 60;
+        procCounter++;
+
+        const node = document.createElement("div");
+        node.className = "process-node active";
+
+        const core = document.createElement("div");
+        core.className = "node-core";
+        node.appendChild(core);
+
+        const ring = document.createElement("div");
+        ring.className = "node-ring";
+        node.appendChild(ring);
+
+        const label = document.createElement("div");
+        label.className = "node-label";
+        label.textContent = `PROC-${String(procCounter).padStart(3, "0")}`;
+        node.appendChild(label);
+
+        processOrbit.appendChild(node);
+
+        const trail = document.createElement("div");
+        trail.className = "process-node trail";
+        processOrbit.appendChild(trail);
+
+        processNodes.push({
+          el: node,
+          trail,
+          angle,
+          radius,
+          speed: 0.008 + Math.random() * 0.012,
+          life: 300 + Math.random() * 200,
+          maxLife: 500,
+        });
+      }
+
+      function animateProcesses() {
+        processNodes.forEach((n, i) => {
+          n.angle += n.speed;
+          n.life--;
+          const progress = n.life / n.maxLife;
+          const r = n.radius * (0.6 + progress * 0.4);
+          const x = Math.cos(n.angle) * r;
+          const y = Math.sin(n.angle) * r;
+          n.el.style.transform = `translate(${160 + x}px, ${160 + y}px)`;
+
+          const opacity = Math.min(1, progress * 3) * 0.85;
+          n.el.style.opacity = opacity;
+          n.el.style.zIndex = progress > 0.5 ? 5 : 3;
+
+          const tx = Math.cos(n.angle - n.speed * 5) * r;
+          const ty = Math.sin(n.angle - n.speed * 5) * r;
+          n.trail.style.transform = `translate(${160 + tx}px, ${160 + ty}px)`;
+          n.trail.style.opacity = opacity * 0.3;
+
+          if (n.life <= 0) {
+            n.el.remove();
+            n.trail.remove();
+            processNodes.splice(i, 1);
+          }
+        });
+
+        processAnimFrame = requestAnimationFrame(animateProcesses);
+      }
+      animateProcesses();
+
+      // ========== MODE TOGGLE ==========
+      let cameraStream = null;
+      let isCameraMode = false;
+      let cameraTransitioning = false;
+
+      document
+        .querySelectorAll(".mode-btn, .mockup-mode-btn")
+        .forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            document
+              .querySelectorAll(".mode-btn, .mockup-mode-btn")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            isCameraMode = btn.dataset.mode === "camera";
+            toggleCameraMode(isCameraMode);
+          });
+        });
+
+      async function toggleCameraMode(active) {
+        if (cameraTransitioning) return;
+        cameraTransitioning = true;
+
+        const core = document.getElementById("coreContainer");
+        const sideLeft = document.querySelector(".sidebar-left");
+        const sideRight = document.querySelector(".sidebar-right");
+        const cameraView = document.getElementById("cameraView");
+        const video = document.getElementById("cameraFeed");
+
+        if (active) {
+          // Calculate current center position of core
+          const rect = core.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+
+          // Target: bottom-right corner
+          const margin = 40;
+          const scale = 0.35;
+          const sw = rect.width * scale;
+          const sh = rect.height * scale;
+          const tx = window.innerWidth - margin - sw / 2;
+          const ty = window.innerHeight - margin - sh / 2;
+          const dx = tx - cx;
+          const dy = ty - cy;
+
+          // Fade out sidebars
+          sideLeft.style.opacity = "0";
+          sideRight.style.opacity = "0";
+          sideLeft.style.pointerEvents = "none";
+          sideRight.style.pointerEvents = "none";
+
+          // Animate core to bottom-right and scale down
+          core.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+
+          // Fade in camera view
+          setTimeout(() => cameraView.classList.add("active"), 100);
+
+          // Start camera after transition begins
+          setTimeout(async () => {
+            try {
+              cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                  facingMode: "user",
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                },
+              });
+              video.srcObject = cameraStream;
+            } catch (e) {
+              console.warn("Camera not available:", e);
+            }
+          }, 300);
+
+          setTimeout(() => {
+            cameraTransitioning = false;
+          }, 900);
+        } else {
+          // Fade out camera
+          cameraView.classList.remove("active");
+
+          // Stop camera after fade
+          setTimeout(() => {
+            if (cameraStream) {
+              cameraStream.getTracks().forEach((t) => t.stop());
+              cameraStream = null;
+              video.srcObject = null;
+            }
+          }, 400);
+
+          // Animate core back to center and restore sidebars
+          core.style.transform = "";
+
+          setTimeout(() => {
+            sideLeft.style.opacity = "";
+            sideRight.style.opacity = "";
+            sideLeft.style.pointerEvents = "";
+            sideRight.style.pointerEvents = "";
+          }, 100);
+
+          setTimeout(() => {
+            cameraTransitioning = false;
+          }, 900);
+        }
+      }
+
+      // ========== IMAGE DISPLAY ==========
+      const imageDisplay = document.getElementById("imageDisplay");
+      const imageCard = document.getElementById("imageCard");
+      const imgPlaceholder = document.getElementById("imgPlaceholder");
+      const imgClose = document.getElementById("imgClose");
+      const imgWebBtn = document.getElementById("imgWebBtn");
+      const connectorBeam = document.getElementById("connectorBeam");
+      const beamCanvas = document.getElementById("beamCanvas");
+      const beamCtx = beamCanvas.getContext("2d");
+      let currentImageUrl = "";
+      let beamAnim = null;
+
+      function positionImageCard() {
+        const core = document.getElementById("coreContainer");
+        const cr = core.getBoundingClientRect();
+        const gap = 14;
+        const cardW = Math.min(270, window.innerWidth * 0.8);
+
+        imageCard.style.width = cardW + "px";
+        imageCard.style.maxWidth = "";
+
+        let left = cr.left - cardW - gap;
+        let top = cr.top - cardW * 0.5 - gap;
+
+        left = Math.max(10, Math.min(left, window.innerWidth - cardW - 10));
+        top = Math.max(56, Math.min(top, window.innerHeight - cardW * 0.6));
+
+        imageCard.style.left = left + "px";
+        imageCard.style.top = top + "px";
+      }
+
+      function drawBeam() {
+        const core = document.getElementById("coreContainer");
+        const cr = core.getBoundingClientRect();
+        const cx = cr.left + cr.width / 2;
+        const cy = cr.top + cr.height / 2;
+
+        const cardR = imageCard.getBoundingClientRect();
+        const fromX = cardR.right;
+        const fromY = cardR.bottom;
+
+        const dx = cx - fromX;
+        const dy = cy - fromY;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx);
+
+        const pad = 40;
+        connectorBeam.style.left = fromX - pad + "px";
+        connectorBeam.style.top = fromY - pad + "px";
+        connectorBeam.style.width = len + pad * 2 + "px";
+        connectorBeam.style.height = pad * 2 + "px";
+
+        beamCanvas.width = len + pad * 2;
+        beamCanvas.height = pad * 2;
+
+        const bCtx = beamCtx;
+        bCtx.clearRect(0, 0, beamCanvas.width, beamCanvas.height);
+        bCtx.save();
+        bCtx.translate(pad, pad);
+        bCtx.rotate(angle);
+
+        // Main beam line
+        bCtx.beginPath();
+        bCtx.moveTo(0, 0);
+        bCtx.lineTo(len, 0);
+        bCtx.strokeStyle = `rgba(0, 212, 255, 0.15)`;
+        bCtx.lineWidth = 1;
+        bCtx.setLineDash([4, 6]);
+        bCtx.stroke();
+
+        // Glow
+        bCtx.beginPath();
+        bCtx.moveTo(0, 0);
+        bCtx.lineTo(len, 0);
+        bCtx.strokeStyle = `rgba(0, 212, 255, ${0.04 + Math.sin(Date.now() / 500) * 0.02})`;
+        bCtx.lineWidth = 3;
+        bCtx.setLineDash([]);
+        bCtx.shadowBlur = 10;
+        bCtx.shadowColor = "rgba(0,212,255,0.2)";
+        bCtx.stroke();
+
+        // Data pulses
+        const pulsePos = (Date.now() % 1500) / 1500;
+        bCtx.beginPath();
+        bCtx.arc(len * pulsePos, 0, 2, 0, Math.PI * 2);
+        bCtx.fillStyle = `rgba(0, 212, 255, ${0.6 + Math.sin(pulsePos * Math.PI) * 0.3})`;
+        bCtx.shadowBlur = 15;
+        bCtx.shadowColor = "rgba(0,212,255,0.6)";
+        bCtx.fill();
+
+        bCtx.restore();
+      }
+
+      function startBeamAnimation() {
+        connectorBeam.classList.add("active");
+        function frame() {
+          drawBeam();
+          beamAnim = requestAnimationFrame(frame);
+        }
+        beamAnim = requestAnimationFrame(frame);
+      }
+
+      function stopBeamAnimation() {
+        if (beamAnim) {
+          cancelAnimationFrame(beamAnim);
+          beamAnim = null;
+        }
+        connectorBeam.classList.remove("active");
+      }
+
+      function restartImageReveal() {
+        const imgSurface = imgPlaceholder;
+        imageCard.style.animation = "none";
+        imgSurface.style.animation = "none";
+        imageCard.offsetHeight;
+        imageCard.style.animation = "";
+        imgSurface.style.animation = "";
+      }
+
+      window.showImage = function (url, webUrl) {
+        currentImageUrl = webUrl || url;
+        imgPlaceholder.innerHTML = `<img src="${url}" alt="Visualización">`;
+        positionImageCard();
+        restartImageReveal();
+        imageDisplay.classList.add("active");
+        // Recalculate position after animation
+        setTimeout(positionImageCard, 50);
+        startBeamAnimation();
+      };
+
+      function closeImageDisplay() {
+        imageDisplay.classList.remove("active");
+        stopBeamAnimation();
+      }
+
+      imgClose.addEventListener("click", closeImageDisplay);
+      imageDisplay.addEventListener("click", (e) => {
+        if (e.target === imageDisplay) closeImageDisplay();
+      });
+      imgWebBtn.addEventListener("click", () => {
+        if (currentImageUrl) window.open(currentImageUrl, "_blank");
+      });
+
+      // Reposition on resize
+      window.addEventListener("resize", () => {
+        if (imageDisplay.classList.contains("active")) positionImageCard();
+      });
+
+      // Demo image button
+      document.getElementById("imgDemoBtn").addEventListener("click", () => {
+        showImage(
+          "https://picsum.photos/seed/jarvis-demo/800/450",
+          "https://picsum.photos/seed/jarvis-demo/800/450",
+        );
+        setState("processing");
+        setTimeout(() => setState("speaking"), 500);
+        setTimeout(() => setState("waiting"), 2000);
+      });
+
+      // Demo processes button
+      document
+        .getElementById("procDemoBtn")
+        .addEventListener("click", spawnProcess);
+
+      // ========== CHAT ==========
+      const chatInput = document.getElementById("chatInput");
+      const btnSend = document.getElementById("btnSend");
+      const userPanel = document.getElementById("userPanel");
+      const jarvisPanel = document.getElementById("jarvisPanel");
+
+      const jarvisResponses = [
+        "Analizando datos... patrón detectado.",
+        "Sistema operativo al 100%. Listo para proceder.",
+        "Escaneo completo. No se encontraron anomalías.",
+        "Conectando con servidores satelitales... enlace establecido.",
+        "Procesamiento completado. Resultados óptimos.",
+        "Inicializando protocolos de seguridad. Todo en orden.",
+        "Cálculo completado. Probabilidad de éxito: 97.3%",
+        "Sincronizando bases de datos. Transferencia estable.",
+      ];
+
+      function addMessage(panel, text, isJarvis = false) {
+        if (!panel) return;
+        const icon = isJarvis ? "◆" : "▸";
+        panel.innerHTML = `<div class="msg${isJarvis ? " jarvis" : ""}">${icon} ${text}</div>`;
+      }
+
+      function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addMessage(userPanel, text);
+        chatInput.value = "";
+        setState("processing");
+        setTimeout(
+          () => {
+            setState("speaking");
+            const response =
+              jarvisResponses[
+                Math.floor(Math.random() * jarvisResponses.length)
+              ];
+            addMessage(jarvisPanel, response, true);
+            setTimeout(() => setState("waiting"), 1500);
+          },
+          800 + Math.random() * 1200,
+        );
+
+        if (Math.random() < 0.2) {
+          setTimeout(() => {
+            showImage(
+              `https://picsum.photos/seed/${Date.now()}/800/450`,
+              `https://picsum.photos/seed/${Date.now()}/800/450`,
+            );
+          }, 400);
+        }
+      }
+
+      btnSend.addEventListener("click", sendMessage);
+      chatInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendMessage();
+      });
+
+      // ========== DEMO STATE ROTATION ==========
+      let demoInterval;
+      function startDemo() {
+        const states = [
+          "waiting",
+          "speaking",
+          "listening",
+          "processing",
+          "error",
+        ];
+        let i = 0;
+        demoInterval = setInterval(() => {
+          setState(states[i]);
+          i = (i + 1) % states.length;
+        }, 3000);
+      }
+      // Uncomment to auto-cycle states:
+      // startDemo();
+
+      // ========== HOVER EFFECT ==========
+      let savedTransform = "";
+      document
+        .getElementById("coreSection")
+        .addEventListener("mousemove", (e) => {
+          if (isCameraMode || cameraTransitioning) return;
+          const container = document.getElementById("coreContainer");
+          const rect = container.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = (e.clientX - cx) / rect.width;
+          const dy = (e.clientY - cy) / rect.height;
+          container.style.transform = `perspective(800px) rotateY(${dx * 10}deg) rotateX(${-dy * 10}deg)`;
+        });
+
+      document
+        .getElementById("coreSection")
+        .addEventListener("mouseleave", () => {
+          if (isCameraMode || cameraTransitioning) return;
+          document.getElementById("coreContainer").style.transform =
+            "perspective(800px) rotateY(0deg) rotateX(0deg)";
+        });
+
+      // ========== SYSTEM MONITOR ==========
+      const cpuValue = document.getElementById("cpuValue");
+      const gpuValue = document.getElementById("gpuValue");
+      const ramValue = document.getElementById("ramValue");
+      const netValue = document.getElementById("netValue");
+
+      // --- SIMULACION (mockup) ---
+      function getMockupSysData() {
+        return {
+          mockupCpu: 15 + Math.random() * 45 + Math.sin(Date.now() / 3000) * 10,
+          mockupGpu: 10 + Math.random() * 30 + Math.sin(Date.now() / 5000) * 8,
+          mockupRam: 40 + Math.random() * 20 + Math.sin(Date.now() / 7000) * 5,
+          mockupNet: 5 + Math.random() * 25 + Math.sin(Date.now() / 4000) * 8,
+        };
+      }
+
+      // --- LOGICA (render) ---
+      function renderSysMon() {
+        const d = getMockupSysData();
+        cpuValue.textContent = Math.round(d.mockupCpu) + "%";
+        gpuValue.textContent = Math.round(d.mockupGpu) + "%";
+        ramValue.textContent = ((d.mockupRam / 100) * 16).toFixed(1) + " GB";
+        netValue.textContent = (d.mockupNet * 1.2).toFixed(0) + " Mbps";
+      }
+      setInterval(renderSysMon, 1500);
+      renderSysMon();
+
+      // ========== LOADING SEQUENCE ==========
+      setTimeout(() => setState("processing"), 300);
+      setTimeout(() => setState("waiting"), 1500);
+
+      // Init
+      setState("waiting");
+    </script>
+  </body>
+</html>

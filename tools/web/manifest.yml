@@ -1,0 +1,67 @@
+# Manifest describing web tool actions (search, open_tab, close_tab, etc.).
+name: web_tools
+description: Herramientas para interactuar con la web y el navegador.
+version: 1.0.0
+actions:
+  search:
+    description: Realiza una búsqueda en la web utilizando el navegador especificado o por defecto.
+    parameters:
+      query: string
+      browser: string
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  open_tab:
+    description: Abre una nueva pestaña en el navegador con la URL provista.
+    parameters:
+      url: string
+      browser: string
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  close_tab:
+    description: Cierra la pestaña activa en el navegador utilizando atajos de teclado virtuales.
+    parameters: {}
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  open_whatsapp:
+    description: Abre WhatsApp Web, busca un contacto o número, y envía o lee mensajes.
+    parameters:
+      phone: string
+      contact_name: string
+      message: string
+      action: string
+      browser: string
+    permission_level: medium
+    risk: critical
+    platforms: [linux, windows, macos]
+  open_youtube:
+    description: Abre YouTube, busca un video o reproduce el primer resultado directamente.
+    parameters:
+      query: string
+      action: string
+      browser: string
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  web_search_direct:
+    description: Realiza una búsqueda programática en la web y devuelve los resultados de DuckDuckGo directamente sin abrir un navegador.
+    parameters:
+      query: string
+      max_results: integer
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]
+  google_maps:
+    description: Abre Google Maps en el navegador para buscar una ubicación o ruta/direcciones.
+    parameters:
+      query: string
+      action: string
+      origin: string
+      destination: string
+      travel_mode: string
+      browser: string
+    permission_level: low
+    risk: read_only
+    platforms: [linux, windows, macos]

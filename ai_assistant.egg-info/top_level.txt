@@ -1,0 +1,14 @@
+app
+automation
+cli
+core
+host
+interfaces
+llm
+memory
+runtime
+security
+services
+tools
+vision
+voice
