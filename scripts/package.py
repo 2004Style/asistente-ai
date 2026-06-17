@@ -218,6 +218,7 @@ def main():
     args = [
         entry_point,
         "--name=rbot",
+        "--paths=.",
         "--onefile",  # Package into a single executable binary
     ] + add_data_args + [
         "--clean",
