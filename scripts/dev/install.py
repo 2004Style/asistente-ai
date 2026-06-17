@@ -72,9 +72,9 @@ def create_developer_symlinks():
                     subprocess.run(f'mklink /J "{dst}" "{src}"', shell=True, check=True, stdout=subprocess.DEVNULL)
                 else:
                     os.symlink(src, dst)
-                print(f"  [✔] Symlink created: {dst} -> {src}")
+                print(f"  [OK] Symlink created: {dst} -> {src}")
             except Exception as e:
-                print(f"  [✘] Failed to create symlink {dst} -> {src}: {e}")
+                print(f"  [ERROR] Failed to create symlink {dst} -> {src}: {e}")
 
 def main():
     print("=========================================")
